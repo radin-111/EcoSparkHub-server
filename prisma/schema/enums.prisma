@@ -2,3 +2,9 @@ enum UserRoles {
     ADMIN
     MEMBER
 }
+
+enum IdeaStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}

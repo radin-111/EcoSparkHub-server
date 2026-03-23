@@ -4,10 +4,12 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  role          UserRoles @default(MEMBER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  comments      Comment[]
 
   @@unique([email])
   @@map("user")
@@ -59,4 +61,19 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ideaId    String
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([ideaId])
+  @@map("comment")
 }

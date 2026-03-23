@@ -1,8 +1,9 @@
 import app from "./app";
+import { envConfig } from "./app/config/env";
 
 const main = async () => {
   try {
-    app.listen(5000, () => {
+    app.listen(envConfig.PORT, () => {
       console.log("Server is running on port 5000");
     });
   } catch (error) {

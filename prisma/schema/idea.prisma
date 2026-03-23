@@ -1,0 +1,11 @@
+model Idea {
+    id          String     @id @default(uuid())
+    name        String
+    description String
+    status      IdeaStatus @default(PENDING)
+    up_vote     Int        @default(0)
+    down_vote   Int        @default(0)
+    categoryId  String
+    category    Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    comments    Comment[]
+}
