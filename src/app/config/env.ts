@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-interface envConfig {
+interface allEnv {
   DATABASE_URL: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
@@ -12,10 +12,14 @@ interface envConfig {
   APP_PASS: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
+  ACCESS_TOKEN_EXPIRES_IN: string;
+  REFRESH_TOKEN_EXPIRES_IN: string;
+  ACCESS_TOKEN_SECRET: string;
+  REFRESH_TOKEN_SECRET: string;
   NODE_ENV: string;
 }
 
-const loadEnv = () => {
+const loadEnv = (): allEnv => {
   const envVariables = [
     "DATABASE_URL",
     "BETTER_AUTH_SECRET",
@@ -45,7 +49,11 @@ const loadEnv = () => {
     APP_PASS: process.env.APP_PASS as string,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET as string,
+    REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET as string,
     NODE_ENV: process.env.NODE_ENV as string,
+    ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
+    REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
   };
 };
 
