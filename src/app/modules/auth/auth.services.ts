@@ -1,14 +1,40 @@
 import z from "zod";
 import { signupSchema } from "./auth.validation";
 import { auth } from "../../lib/auth";
+import { tokenUtils } from "../../utils/token";
 
-const signup = async(payload:z.infer<typeof signupSchema>)=>{
-    const data = await  auth.api.signUpEmail({
-        body: payload,
-    });
-    
-}
+const signup = async (payload: z.infer<typeof signupSchema>) => {
+  const data = await auth.api.signUpEmail({
+    body: payload,
+  });
 
-export const authServices={
-    signup,
-}
+  const accessToken = tokenUtils.getAccessToken({
+    userId: data.user.id,
+    role: data.user.role,
+    profileStatus: data.user.profileStatus,
+    isDeleted: data.user.isDeleted,
+    needPasswordChange: data.user.needPasswordChange,
+    deletedAt: data.user.deletedAt,
+    emailVerified: data.user.emailVerified,
+  });
+  const refreshToken = tokenUtils.getRefreshToken({
+    userId: data.user.id,
+    role: data.user.role,
+    profileStatus: data.user.profileStatus,
+    isDeleted: data.user.isDeleted,
+    needPasswordChange: data.user.needPasswordChange,
+    deletedAt: data.user.deletedAt,
+    emailVerified: data.user.emailVerified,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+
+    ...data,
+  };
+};
+
+export const authServices = {
+  signup,
+};

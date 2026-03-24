@@ -8,3 +8,7 @@ enum IdeaStatus {
     APPROVED
     REJECTED
 }
+enum ProfileStatus {
+    ACTIVE
+    INACTIVE
+}

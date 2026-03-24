@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
-
+import { ProfileStatus, UserRoles } from "../../generated/prisma/enums";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -13,6 +13,35 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     passwordReset: {
       enabled: true,
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: UserRoles.MEMBER,
+      },
+      profileStatus: {
+        type: "string",
+        required: true,
+        defaultValue: ProfileStatus.ACTIVE,
+      },
+      isDeleted: {
+        type: "boolean",
+        required: true,
+        defaultValue: false,
+      },
+      needPasswordChange: {
+        type: "boolean",
+        required: true,
+        defaultValue: false,
+      },
+      deletedAt: {
+        type: "date",
+        required: false,
+        defaultValue: null,
+      },
     },
   },
 });
