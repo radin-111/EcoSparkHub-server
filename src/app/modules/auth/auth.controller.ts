@@ -29,6 +29,6 @@ const signup = async (req: Request, res: Response) => {
   }
 };
 
-export const authController = {
+export const authControllers = {
   signup,
 };

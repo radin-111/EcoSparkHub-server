@@ -1,9 +1,10 @@
 import z from "zod";
-import { signupSchema } from "./auth.validation";
+
 import { auth } from "../../lib/auth";
 import { tokenUtils } from "../../utils/token";
+import { IAuthSignUp } from "./auth.interface";
 
-const signup = async (payload: z.infer<typeof signupSchema>) => {
+const signup = async (payload: IAuthSignUp) => {
   const data = await auth.api.signUpEmail({
     body: payload,
   });
