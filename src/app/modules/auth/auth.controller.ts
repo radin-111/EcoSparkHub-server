@@ -28,7 +28,49 @@ const signup = async (req: Request, res: Response) => {
     });
   }
 };
+const signIn = async (req: Request, res: Response) => {
+  try {
+    const result = await authServices.signIn(req.body);
+    const { accessToken, refreshToken, token, ...rest } = result;
+    tokenUtils.setAccessTokenCookie(res, accessToken);
+    tokenUtils.setRefreshTokenCookie(res, refreshToken);
+    tokenUtils.setBetterAuthSessionCookie(res, token as string);
+    res.status(200).json({
+      success: true,
+      message: "User signed in successfully",
+      data: {
+        accessToken,
+        refreshToken,
+        token,
+        ...rest,
+      },
+    });
+  } catch (error: any) {
+    res.status(status.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "User signed in failed",
+      error: error.message,
+    });
+  }
+};
 
+const signOut = async (req: Request, res: Response) => {
+  try {
+   
+    res.status(200).json({
+      success: true,
+      message: "User signed out successfully",
+    });
+  } catch (error: any) {
+    res.status(status.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "User signed out failed",
+      error: error.message,
+    });
+  }
+};
 export const authControllers = {
   signup,
+  signIn,
+  signOut,
 };

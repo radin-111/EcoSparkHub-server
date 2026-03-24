@@ -3,12 +3,16 @@ import cors from "cors";
 import { indexRoutes } from "./app/routes";
 import { notFound } from "./app/middlewares/notfound";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
 app.use(express.json());
-
+app.use(cookieParser());
 app.use("/api/v1", indexRoutes);
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -30,6 +30,6 @@ export const globalErrorHandler = async (
     error: envConfig.NODE_ENV === "development" ? error : undefined,
     stack: envConfig.NODE_ENV === "development" ? stack : undefined,
   };
-
+// console.log("hello from error");
   res.status(statusCode).json(errorResponse);
 };

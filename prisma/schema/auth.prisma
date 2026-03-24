@@ -9,7 +9,7 @@ model User {
   needPasswordChange Boolean       @default(false)
   profileStatus      ProfileStatus @default(ACTIVE)
   isDeleted          Boolean       @default(false)
-  deletedAt          DateTime?
+  deletedAt          DateTime?  
   updatedAt          DateTime      @updatedAt
   sessions           Session[]
   accounts           Account[]

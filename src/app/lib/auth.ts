@@ -2,12 +2,15 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { ProfileStatus, UserRoles } from "../../generated/prisma/enums";
+import { envConfig } from "../config/env";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
 
+  trustedOrigins:[envConfig.BETTER_AUTH_URL],
+  secret: envConfig.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -44,4 +47,27 @@ export const auth = betterAuth({
       },
     },
   },
+
+  advanced: {
+        
+        useSecureCookies : true,
+        cookies:{
+            state:{
+                attributes:{
+                    sameSite: "none",
+                    secure: true,
+                    httpOnly: true,
+                    path: "/",
+                }
+            },
+            sessionToken:{
+                attributes:{
+                    sameSite: "none",
+                    secure: true,
+                    httpOnly: true,
+                    path: "/",
+                }
+            }
+        }
+    }
 });
