@@ -2,7 +2,7 @@ import z from "zod";
 
 import { auth } from "../../lib/auth";
 import { tokenUtils } from "../../utils/token";
-import { signInSchema, signUpSchema } from "./auth.validation";
+import { signInSchema, signUpSchema, verifyEmailSchema } from "./auth.validation";
 
 const signup = async (payload: z.infer<typeof signUpSchema>) => {
   const data = await auth.api.signUpEmail({
@@ -66,7 +66,18 @@ const signIn = async (payload: z.infer<typeof signInSchema>) => {
     ...data,
   };
 };
+const verifyEmail = async (payload: z.infer<typeof verifyEmailSchema>) => {
+  
+  const data = await auth.api.verifyEmailOTP({
+    body: {
+      email: payload.email,
+      otp: payload.otp,
+    },
+  });
+  return data;
+};
 export const authServices = {
   signup,
   signIn,
+  verifyEmail,
 };

@@ -16,6 +16,14 @@ interface allEnv {
   REFRESH_TOKEN_EXPIRES_IN: string;
   ACCESS_TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
+
+  EMAIL_SENDER:{
+    EMAIL_SENDER_EMAIL: string;
+    EMAIL_SENDER_PASS: string;
+    EMAIL_SENDER_NAME: string;
+    EMAIL_SENDER_HOST: string;
+    EMAIL_SENDER_PORT: string;
+  }
   NODE_ENV: string;
 }
 
@@ -26,8 +34,11 @@ const loadEnv = (): allEnv => {
     "BETTER_AUTH_URL",
     "PORT",
     "APP_URL",
-    "APP_USER",
-    "APP_PASS",
+    "EMAIL_SENDER_EMAIL",
+    "EMAIL_SENDER_PASS",
+    "EMAIL_SENDER_NAME",
+    "EMAIL_SENDER_HOST",
+    "EMAIL_SENDER_PORT",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "NODE_ENV",
@@ -47,6 +58,13 @@ const loadEnv = (): allEnv => {
     APP_URL: process.env.APP_URL as string,
     APP_USER: process.env.APP_USER as string,
     APP_PASS: process.env.APP_PASS as string,
+    EMAIL_SENDER:{
+      EMAIL_SENDER_EMAIL: process.env.EMAIL_SENDER_EMAIL as string,
+      EMAIL_SENDER_PASS: process.env.EMAIL_SENDER_PASS as string,
+      EMAIL_SENDER_NAME: process.env.EMAIL_SENDER_NAME as string,
+      EMAIL_SENDER_HOST: process.env.EMAIL_SENDER_HOST as string,
+      EMAIL_SENDER_PORT: process.env.EMAIL_SENDER_PORT as string,
+    },
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET as string,

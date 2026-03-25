@@ -4,12 +4,15 @@ import { prisma } from "./prisma";
 import { ProfileStatus, UserRoles } from "../../generated/prisma/enums";
 import { envConfig } from "../config/env";
 
+import { bearer, emailOTP } from "better-auth/plugins";
+import { sendEmailOtp } from "../utils/email";
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
 
-  trustedOrigins:[envConfig.BETTER_AUTH_URL],
+  trustedOrigins: [envConfig.BETTER_AUTH_URL],
   secret: envConfig.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
@@ -17,6 +20,11 @@ export const auth = betterAuth({
     passwordReset: {
       enabled: true,
     },
+  },
+  emailVerification: {
+    sendOnSignIn: true,
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
   },
   user: {
     additionalFields: {
@@ -48,26 +56,66 @@ export const auth = betterAuth({
     },
   },
 
-  advanced: {
-        
-        useSecureCookies : true,
-        cookies:{
-            state:{
-                attributes:{
-                    sameSite: "none",
-                    secure: true,
-                    httpOnly: true,
-                    path: "/",
-                }
+  plugins: [
+    bearer(),
+    emailOTP({
+      overrideDefaultEmailVerification: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        if (type === "email-verification") {
+          const user = await prisma.user.findUnique({
+            where: {
+              email,
             },
-            sessionToken:{
-                attributes:{
-                    sameSite: "none",
-                    secure: true,
-                    httpOnly: true,
-                    path: "/",
-                }
-            }
+          });
+          if (!user) {
+            return;
+          }
+
+          if (!user?.emailVerified) {
+            sendEmailOtp({
+              to: email,
+              subject: "Verify your email",
+              templateName: "otp",
+              templateData: {
+                email,
+                name: user.name,
+                otp,
+              },
+            });
+          }
         }
-    }
+      },
+      expiresIn: 60 * 2, // 2 minutes in seconds
+      otpLength: 6,
+    }),
+  ],
+  session: {
+    expiresIn: 60 * 60 * 24 * 15, // 15 days
+    updateAge: 60 * 60 * 24 * 15, // 15 days
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 15, // 15 days
+    },
+  },
+  advanced: {
+    useSecureCookies: true,
+    cookies: {
+      state: {
+        attributes: {
+          sameSite: "none",
+          secure: true,
+          httpOnly: true,
+          path: "/",
+        },
+      },
+      sessionToken: {
+        attributes: {
+          sameSite: "none",
+          secure: true,
+          httpOnly: true,
+          path: "/",
+        },
+      },
+    },
+  },
 });

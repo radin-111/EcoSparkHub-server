@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OTP Verification</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #00c853, #43a047);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .content {
+      padding: 30px;
+      color: #333;
+    }
+    .content h2 {
+      margin-top: 0;
+    }
+    .otp-box {
+      margin: 25px 0;
+      text-align: center;
+    }
+    .otp {
+      display: inline-block;
+      padding: 15px 25px;
+      font-size: 28px;
+      letter-spacing: 5px;
+      font-weight: bold;
+      background: #f1f8e9;
+      border: 2px dashed #43a047;
+      border-radius: 8px;
+      color: #2e7d32;
+    }
+    .footer {
+      text-align: center;
+      font-size: 13px;
+      color: #777;
+      padding: 20px;
+      border-top: 1px solid #eee;
+    }
+    .highlight {
+      color: #2e7d32;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="header">
+      EcoSparkHub
+    </div>
+
+    <div class="content">
+      <h2>Hello, <%= name %> 👋</h2>
+
+      <p>
+        We received a request to verify your email address:
+        <br />
+        <span class="highlight"><%= email %></span>
+      </p>
+
+      <p>
+        Please use the following One-Time Password (OTP) to complete your verification:
+      </p>
+
+      <div class="otp-box">
+        <div class="otp"><%= otp %></div>
+      </div>
+
+      <p>
+        This OTP is valid for a limited time. Do not share it with anyone.
+      </p>
+
+      <p>
+        If you didn’t request this, you can safely ignore this email.
+      </p>
+
+      <p>
+        Thanks, <br />
+        <strong>EcoSparkHub Team</strong>
+      </p>
+    </div>
+
+    <div class="footer">
+      © <%= new Date().getFullYear() %> EcoSparkHub. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>
