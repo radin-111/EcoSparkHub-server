@@ -2,91 +2,65 @@ import { Request, Response } from "express";
 import { authServices } from "./auth.services";
 import status from "http-status";
 import { tokenUtils } from "../../utils/token";
+import { catchAsync } from "../../shared/catchAsync";
+import { sendResponse } from "../../shared/sendResponse";
 
+const signup = catchAsync(async (req: Request, res: Response) => {
+  const result = await authServices.signup(req.body);
+  const { accessToken, refreshToken, token, ...rest } = result;
+  tokenUtils.setAccessTokenCookie(res, accessToken);
+  tokenUtils.setRefreshTokenCookie(res, refreshToken);
+  tokenUtils.setBetterAuthSessionCookie(res, token as string);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.CREATED,
+    message: "User signed up successfully",
+    data: {
+      accessToken,
+      refreshToken,
+      token,
+      ...rest,
+    },
+  });
+});
 
-const signup = async (req: Request, res: Response) => {
-  try {
-    const result = await authServices.signup(req.body);
-    const { accessToken, refreshToken, token, ...rest } = result;
-    tokenUtils.setAccessTokenCookie(res, accessToken);
-    tokenUtils.setRefreshTokenCookie(res, refreshToken);
-    tokenUtils.setBetterAuthSessionCookie(res, token as string);
-    res.status(201).json({
-      success: true,
-      message: "User signed up successfully",
-      data: {
-        accessToken,
-        refreshToken,
-        token,
-        ...rest,
-      },
-    });
-  } catch (error: any) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "User signed up failed",
-      error: error.message,
-    });
-  }
-};
-const signIn = async (req: Request, res: Response) => {
-  try {
-    const result = await authServices.signIn(req.body);
-    const { accessToken, refreshToken, token, ...rest } = result;
-    tokenUtils.setAccessTokenCookie(res, accessToken);
-    tokenUtils.setRefreshTokenCookie(res, refreshToken);
-    tokenUtils.setBetterAuthSessionCookie(res, token as string);
-    res.status(200).json({
-      success: true,
-      message: "User signed in successfully",
-      data: {
-        accessToken,
-        refreshToken,
-        token,
-        ...rest,
-      },
-    });
-  } catch (error: any) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "User signed in failed",
-      error: error.message,
-    });
-  }
-};
+const signIn = catchAsync(async (req: Request, res: Response) => {
+  const result = await authServices.signIn(req.body);
+  const { accessToken, refreshToken, token, ...rest } = result;
+  tokenUtils.setAccessTokenCookie(res, accessToken);
+  tokenUtils.setRefreshTokenCookie(res, refreshToken);
+  tokenUtils.setBetterAuthSessionCookie(res, token as string);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "User signed in successfully",
+    data: {
+      accessToken,
+      refreshToken,
+      token,
+      ...rest,
+    },
+  });
+});
 
-const signOut = async (req: Request, res: Response) => {
-  try {
-   
-    res.status(200).json({
-      success: true,
-      message: "User signed out successfully",
-    });
-  } catch (error: any) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "User signed out failed",
-      error: error.message,
-    });
-  }
-};
-const verifyEmail = async (req: Request, res: Response) => {
-  try {
-    const result = await authServices.verifyEmail(req.body);
-   
-    res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Email verification failed",
-      error: error.message,
-    });
-  }
-};
+const signOut = catchAsync(async (req: Request, res: Response) => {
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    data: null,
+    message: "User signed out successfully",
+  });
+});
+
+const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+  const result = await authServices.verifyEmail(req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Email verified successfully",
+    data: result,
+  });
+});
 export const authControllers = {
   signup,
   signIn,
