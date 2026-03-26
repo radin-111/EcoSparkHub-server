@@ -1,6 +1,8 @@
 model Category {
-    id   String @id @default(uuid())
-    name String
-    ideas Idea[]
+    id          String  @id @default(uuid())
+    name        String  @unique
+    description String?
+    ideas       Idea[]
+
     @@map("categories")
 }
