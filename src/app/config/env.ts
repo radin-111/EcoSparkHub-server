@@ -23,8 +23,14 @@ interface allEnv {
     EMAIL_SENDER_NAME: string;
     EMAIL_SENDER_HOST: string;
     EMAIL_SENDER_PORT: string;
+  },
+  CLOUDINARY:{
+    CLOUDINARY_CLOUD_NAME: string;
+    CLOUDINARY_API_SECRET: string;
+    CLOUDINARY_API_KEY: string;
   }
   NODE_ENV: string;
+  STRIPE_SECRET_KEY: string;
 }
 
 const loadEnv = (): allEnv => {
@@ -42,6 +48,7 @@ const loadEnv = (): allEnv => {
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "NODE_ENV",
+    "STRIPE_SECRET_KEY",
   ];
 
   envVariables.forEach((variable) => {
@@ -72,6 +79,12 @@ const loadEnv = (): allEnv => {
     NODE_ENV: process.env.NODE_ENV as string,
     ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
     REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
+    CLOUDINARY:{
+      CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+      CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+      CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+    },
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
   };
 };
 

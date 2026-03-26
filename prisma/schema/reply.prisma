@@ -1,16 +1,14 @@
-model Comment {
+model Reply {
     id        String   @id @default(uuid())
     userId    String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    ideaId    String
-    idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+    commentId String
+    comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
     content   String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    replies   Reply[]
 
     @@index([userId])
-    @@index([ideaId])
-    @@map("comment")
+    @@index([commentId])
+    @@map("reply")
 }
-
