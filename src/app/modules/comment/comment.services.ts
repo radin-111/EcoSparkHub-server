@@ -27,10 +27,7 @@ const createComment = async (
   return result;
 };
 
-const deleteComment = async (
-  user: IRequestUser,
-  commentId: string,
-) => {
+const deleteComment = async (user: IRequestUser, commentId: string) => {
   const isCommentExist = await prisma.comment.findUnique({
     where: {
       id: commentId,
@@ -41,7 +38,10 @@ const deleteComment = async (
     throw new AppError(status.NOT_FOUND, "Comment does not exist");
   }
   if (isCommentExist.userId !== user.userId) {
-    throw new AppError(status.FORBIDDEN, "You are not authorized to delete this comment");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not authorized to delete this comment",
+    );
   }
   const result = await prisma.comment.delete({
     where: {
@@ -53,11 +53,12 @@ const deleteComment = async (
 };
 const updateComment = async (
   user: IRequestUser,
-  comment: z.infer<typeof updateCommentSchema>,
+  commentId: string,
+  commentUpdate: z.infer<typeof updateCommentSchema>,
 ) => {
   const isCommentExist = await prisma.comment.findUnique({
     where: {
-      id: comment.commentId,
+      id: commentId,
       userId: user.userId,
     },
   });
@@ -65,20 +66,22 @@ const updateComment = async (
     throw new AppError(status.NOT_FOUND, "Comment does not exist");
   }
   if (isCommentExist.userId !== user.userId) {
-    throw new AppError(status.FORBIDDEN, "You are not authorized to update this comment");
+    throw new AppError(
+      status.FORBIDDEN,
+      "You are not authorized to update this comment",
+    );
   }
   const result = await prisma.comment.update({
     where: {
-      id: comment.commentId,
+      id: commentId,
       userId: user.userId,
     },
     data: {
-      content: comment.content,
+      content: commentUpdate.content,
+      isUpdated: true,
     },
   });
   return result;
 };
-
-
 
 export const commentServices = { createComment, deleteComment, updateComment };

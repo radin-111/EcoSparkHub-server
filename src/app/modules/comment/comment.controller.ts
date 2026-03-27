@@ -21,7 +21,7 @@ const createComment = catchAsync(async (req: Request, res: Response) => {
 const deleteComment = catchAsync(async (req: Request, res: Response) => {
   const result = await commentServices.deleteComment(
     req.user as IRequestUser,
-    req.body,
+    req.params.commentId as string,
   );
   sendResponse(res, {
     success: true,
@@ -34,6 +34,7 @@ const deleteComment = catchAsync(async (req: Request, res: Response) => {
 const updateComment = catchAsync(async (req: Request, res: Response) => {
   const result = await commentServices.updateComment(
     req.user as IRequestUser,
+    req.params.commentId as string,
     req.body,
   );
   sendResponse(res, {

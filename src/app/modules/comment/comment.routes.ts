@@ -6,7 +6,7 @@ import { auth } from "../../middlewares/auth";
 import { validateData } from "../../middlewares/validateData";
 import {
   commentSchema,
-  deleteCommentSchema,
+ 
   updateCommentSchema,
 } from "./comment.validation";
 
@@ -19,13 +19,13 @@ router.post(
 );
 
 router.delete(
-  "/delete-comment",
+  "/delete-comment/:commentId",
   auth(UserRoles.MEMBER, UserRoles.ADMIN),
-  validateData(deleteCommentSchema),
+
   commentControllers.deleteComment,
 );
 router.patch(
-  "/update-comment",
+  "/update-comment/:commentId",
   auth(UserRoles.MEMBER, UserRoles.ADMIN),
   validateData(updateCommentSchema),
   commentControllers.updateComment,
