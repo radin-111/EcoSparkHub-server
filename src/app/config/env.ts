@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+import status from "http-status";
+import AppError from "../errorHelpers/AppError";
 
 dotenv.config();
 
@@ -53,7 +55,7 @@ const loadEnv = (): allEnv => {
 
   envVariables.forEach((variable) => {
     if (!process.env[variable]) {
-      throw new Error(`Environment variable ${variable} is not set`);
+      throw new AppError(status.BAD_REQUEST, `Environment variable ${variable} is not set`);
     }
   });
 

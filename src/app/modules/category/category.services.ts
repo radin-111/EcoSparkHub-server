@@ -4,6 +4,8 @@ import {
   categoryUpdateValidationSchema,
   categoryValidationSchema,
 } from "./category.validation";
+import AppError from "../../errorHelpers/AppError";
+import status from "http-status";
 
 const createCategory = async (
   payload: z.infer<typeof categoryValidationSchema>,
@@ -28,7 +30,7 @@ const updateCategory = async (
     },
   });
   if (!isExist) {
-    throw new Error("Category not found");
+    throw new AppError(status.NOT_FOUND, "Category not found");
   }
 
   const result = await prisma.category.update({
@@ -46,7 +48,7 @@ const deleteCategory = async (id: string) => {
     },
   });
   if (!isExist) {
-    throw new Error("Category not found");
+    throw new AppError(status.NOT_FOUND, "Category not found");
   }
 
   const result = await prisma.category.delete({

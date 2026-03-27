@@ -1,6 +1,8 @@
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { cloudinaryUpload } from "./cloudinary.config";
 import multer from "multer";
+import AppError from "../errorHelpers/AppError";
+import status from "http-status";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinaryUpload,
@@ -9,7 +11,7 @@ const storage = new CloudinaryStorage({
     const extension = fileName.split(".").pop()?.toLocaleLowerCase();
 
     if (!extension || !["jpg", "jpeg", "png", "pdf"].includes(extension)) {
-      throw new Error("File extension is missing or invalid");
+      throw new AppError(status.BAD_REQUEST, "File extension is missing or invalid");
     }
 
     const fileNameWithoutExtension = fileName

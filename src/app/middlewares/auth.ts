@@ -6,6 +6,8 @@ import { prisma } from "../lib/prisma";
 
 import { jwtUtils } from "../utils/jwt";
 import { envConfig } from "../config/env";
+import AppError from "../errorHelpers/AppError";
+import status from "http-status";
 
 export const auth = (...roles: UserRoles[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +17,7 @@ export const auth = (...roles: UserRoles[]) => {
         "better-auth.session_token",
       );
       if (!sessionToken) {
-        throw new Error("Session token not found! Unauthorized access!");
+        throw new AppError(status.UNAUTHORIZED, "Session token not found! Unauthorized access!");
       }
 
       if (sessionToken) {
@@ -28,7 +30,7 @@ export const auth = (...roles: UserRoles[]) => {
           },
         });
         if (!sessionExists) {
-          throw new Error("Session not found! Unauthorized access!");
+          throw new AppError(status.UNAUTHORIZED, "Session not found! Unauthorized access!");
         }
 
         if (sessionToken && sessionExists) {
@@ -50,7 +52,7 @@ export const auth = (...roles: UserRoles[]) => {
           }
 
           if (roles.length > 0 && !roles.includes(sessionExists.user.role)) {
-            throw new Error("You are not authorized to access this resource!");
+            throw new AppError(status.FORBIDDEN, "You are not authorized to access this resource!");
           }
 
           if (
@@ -58,7 +60,8 @@ export const auth = (...roles: UserRoles[]) => {
             user.profileStatus === ProfileStatus.INACTIVE ||
             !user.emailVerified
           ) {
-            throw new Error(
+            throw new AppError(
+              status.FORBIDDEN,
               "Your account is inactive, deleted or not verified! Please verify your email to continue!",
             );
           }
@@ -73,7 +76,7 @@ export const auth = (...roles: UserRoles[]) => {
       const accessToken = cookieUtils.getCookie(req, "accessToken");
 
       if (!accessToken) {
-        throw new Error("Access token not found! Unauthorized access!");
+        throw new AppError(status.UNAUTHORIZED, "Access token not found! Unauthorized access!");
       }
 
       const verifyToken = jwtUtils.verifyJwtToken(
@@ -81,11 +84,11 @@ export const auth = (...roles: UserRoles[]) => {
         envConfig.ACCESS_TOKEN_SECRET,
       );
       if (!verifyToken.success) {
-        throw new Error("Invalid access token! Unauthorized access!");
+        throw new AppError(status.UNAUTHORIZED, "Invalid access token! Unauthorized access!");
       }
 
       if (roles.length > 0 && !roles.includes(verifyToken.data!.role)) {
-        throw new Error("Invalid access token! Unauthorized access!");
+        throw new AppError(status.FORBIDDEN, "Invalid access token! Unauthorized access!");
       }
       next();
     } catch (error) {

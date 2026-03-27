@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import status from "http-status";
 import { envConfig } from "../config/env";
+import z from "zod";
+import { handleZodError } from "../errorHelpers/handleZodError";
 
 export const globalErrorHandler = async (
   error: any,
@@ -9,10 +11,16 @@ export const globalErrorHandler = async (
   next: NextFunction,
 ) => {
   let errorMessage = "Something went wrong";
-  let statusCode = status.INTERNAL_SERVER_ERROR;
+  let statusCode: any = status.INTERNAL_SERVER_ERROR;
   let stack = "";
   let errorSources: any = [];
-  if (error instanceof Error) {
+
+  if (error instanceof z.ZodError) {
+    const zodErrorResponse = handleZodError(error);
+    errorMessage = zodErrorResponse.message;
+    statusCode = zodErrorResponse.statusCode;
+    errorSources = zodErrorResponse.errorSources;
+  } else if (error instanceof Error) {
     errorMessage = error.message;
     stack = error?.stack || "";
     errorSources = [
@@ -30,6 +38,6 @@ export const globalErrorHandler = async (
     error: envConfig.NODE_ENV === "development" ? error : undefined,
     stack: envConfig.NODE_ENV === "development" ? stack : undefined,
   };
-// console.log("hello from error");
+  // console.log("hello from error");
   res.status(statusCode).json(errorResponse);
 };

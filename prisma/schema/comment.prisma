@@ -5,6 +5,7 @@ model Comment {
     ideaId    String
     idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
     content   String
+    isUpdated Boolean  @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     replies   Reply[]
@@ -13,4 +14,3 @@ model Comment {
     @@index([ideaId])
     @@map("comment")
 }
-

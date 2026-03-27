@@ -1,5 +1,7 @@
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import { envConfig } from "./env";
+import AppError from "../errorHelpers/AppError";
+import status from "http-status";
 
 cloudinary.config({
   cloud_name: envConfig.CLOUDINARY.CLOUDINARY_CLOUD_NAME,
@@ -12,13 +14,13 @@ export const uploadFile = async (
   fileName: string,
 ): Promise<UploadApiResponse> => {
   if (!buffer || !fileName) {
-    throw new Error("Buffer or fileName is missing");
+    throw new AppError(status.BAD_REQUEST, "Buffer or fileName is missing");
   }
 
   const extension = fileName.split(".").pop()?.toLocaleLowerCase();
 
   if (!extension || !["jpg", "jpeg", "png", "pdf"].includes(extension)) {
-    throw new Error("File extension is missing or invalid");
+    throw new AppError(status.BAD_REQUEST, "File extension is missing or invalid");
   }
 
   const fileNameWithoutExtension = fileName
@@ -47,7 +49,7 @@ export const uploadFile = async (
         },
         (error, result) => {
           if (error) {
-            return reject(new Error("Failed to upload file to Cloudinary"));
+            return reject(new AppError(status.BAD_REQUEST, "Failed to upload file to Cloudinary"));
           }
           resolve(result as UploadApiResponse);
         },
@@ -72,7 +74,8 @@ export const deleteFileFromCloudinary = async (url: string) => {
     }
   } catch (error) {
     console.error("Error deleting file from Cloudinary:", error);
-    throw new Error(
+    throw new AppError(
+      status.BAD_REQUEST,
       "Failed to delete file from Cloudinary",
     );
   }
