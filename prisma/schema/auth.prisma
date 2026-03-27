@@ -15,10 +15,13 @@ model User {
   accounts           Account[]
   comments           Comment[]
   replies            Reply[]
+  ideas              Idea[]
 
   @@unique([email])
   @@map("user")
 }
+
+
 
 model Session {
   id        String   @id

@@ -5,7 +5,9 @@ import { tokenUtils } from "../../utils/token";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 
+
 const signup = catchAsync(async (req: Request, res: Response) => {
+  
   const result = await authServices.signup(req.body);
   const { accessToken, refreshToken, token, ...rest } = result;
   tokenUtils.setAccessTokenCookie(res, accessToken);
