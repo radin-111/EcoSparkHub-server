@@ -20,7 +20,10 @@ const createReply = catchAsync(async (req: Request, res: Response) => {
 });
 const deleteReply = catchAsync(async (req: Request, res: Response) => {
   const { replyId } = req.params;
-  const result = await replyServices.deleteReply(replyId);
+  const result = await replyServices.deleteReply(
+    req.user as IRequestUser,
+    replyId as string,
+  );
   sendResponse(res, {
     success: true,
     statusCode: status.OK,
@@ -28,4 +31,22 @@ const deleteReply = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-export const replyControllers = { createReply, deleteReply };
+const updateReply = catchAsync(async (req: Request, res: Response) => {
+  const { replyId } = req.params;
+  const { content } = req.body;
+  const result = await replyServices.updateReply(
+    req.user as IRequestUser,
+    replyId as string,
+    content,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Reply updated successfully",
+    data: result,
+  });
+});
+
+
+
+export const replyControllers = { createReply, deleteReply, updateReply };

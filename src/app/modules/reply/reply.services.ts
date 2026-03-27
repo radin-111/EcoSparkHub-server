@@ -27,4 +27,49 @@ const createReply = async (
   return createdReply;
 };
 
-export const replyServices = { createReply };
+const deleteReply = async (user: IRequestUser, replyId: string) => {
+  const isReplyExist = await prisma.reply.findUnique({
+    where: {
+      id: replyId,
+      userId: user.userId,
+    },
+  });
+  if (!isReplyExist) {
+    throw new AppError(status.NOT_FOUND, "Reply does not exist");
+  }
+  const result = await prisma.reply.delete({
+    where: {
+      id: replyId,
+      userId: user.userId,
+    },
+  });
+  return result;
+};
+
+const updateReply = async (
+  user: IRequestUser,
+  replyId: string,
+  content: string,
+) => {
+  const isReplyExist = await prisma.reply.findUnique({
+    where: {
+      id: replyId,
+      userId: user.userId,
+    },
+  });
+  if (!isReplyExist) {
+    throw new AppError(status.NOT_FOUND, "Reply does not exist");
+  }
+  const result = await prisma.reply.update({
+    where: {
+      id: replyId,
+      userId: user.userId,
+    },
+    data: {
+      content,
+    },
+  });
+  return result;
+};
+
+export const replyServices = { createReply, deleteReply, updateReply };
