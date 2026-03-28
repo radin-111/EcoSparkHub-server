@@ -4,11 +4,11 @@ import status from "http-status";
 import { tokenUtils } from "../../utils/token";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
-
+import AppError from "../../errorHelpers/AppError";
 
 const signup = catchAsync(async (req: Request, res: Response) => {
-  
   const result = await authServices.signup(req.body);
+
   const { accessToken, refreshToken, token, ...rest } = result;
   tokenUtils.setAccessTokenCookie(res, accessToken);
   tokenUtils.setRefreshTokenCookie(res, refreshToken);
@@ -28,6 +28,9 @@ const signup = catchAsync(async (req: Request, res: Response) => {
 
 const signIn = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.signIn(req.body);
+  // if (!result.user) {
+  //   throw new AppError(status.NOT_FOUND, "Invalid credentials");
+  // }
   const { accessToken, refreshToken, token, ...rest } = result;
   tokenUtils.setAccessTokenCookie(res, accessToken);
   tokenUtils.setRefreshTokenCookie(res, refreshToken);

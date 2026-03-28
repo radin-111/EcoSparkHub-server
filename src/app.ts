@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1", indexRoutes);
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Ideas are here!");
 });
 
 app.use(globalErrorHandler);

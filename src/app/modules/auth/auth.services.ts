@@ -7,6 +7,9 @@ import {
   signUpSchema,
   verifyEmailSchema,
 } from "./auth.validation";
+import AppError from "../../errorHelpers/AppError";
+import status from "http-status";
+import { prisma } from "../../lib/prisma";
 
 const signup = async (payload: z.infer<typeof signUpSchema>) => {
   const data = await auth.api.signUpEmail({
@@ -41,9 +44,12 @@ const signup = async (payload: z.infer<typeof signUpSchema>) => {
 };
 
 const signIn = async (payload: z.infer<typeof signInSchema>) => {
+  
+
   const data = await auth.api.signInEmail({
     body: payload,
   });
+
   const accessToken = tokenUtils.getAccessToken({
     userId: data.user.id,
     role: data.user.role,

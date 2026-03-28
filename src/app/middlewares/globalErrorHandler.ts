@@ -3,6 +3,7 @@ import status from "http-status";
 import { envConfig } from "../config/env";
 import z from "zod";
 import { handleZodError } from "../errorHelpers/handleZodError";
+import AppError from "../errorHelpers/AppError";
 
 export const globalErrorHandler = async (
   error: any,
@@ -20,6 +21,16 @@ export const globalErrorHandler = async (
     errorMessage = zodErrorResponse.message;
     statusCode = zodErrorResponse.statusCode;
     errorSources = zodErrorResponse.errorSources;
+  } else if (error instanceof AppError) {
+    statusCode = error.statusCode;
+    errorMessage = error.message;
+    stack = error?.stack || "";
+    errorSources = [
+      {
+        path: "",
+        message: error.message,
+      },
+    ];
   } else if (error instanceof Error) {
     errorMessage = error.message;
     stack = error?.stack || "";

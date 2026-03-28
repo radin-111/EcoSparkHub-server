@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 
-router.get("/", categoryControllers.getAllCategories);
+router.get("/all-categories", categoryControllers.getAllCategories);
 
 router.post(
   "/create-category",
