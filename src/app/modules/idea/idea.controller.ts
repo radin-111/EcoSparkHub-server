@@ -20,7 +20,10 @@ const changeIdeaStatus = catchAsync(async (req: Request, res: Response) => {
 const createIdea = catchAsync(async (req: Request, res: Response) => {
   const imageUrl = req.file?.path;
   const payload = { ...req.body, imageUrl };
-  const data = await ideaServices.createIdea(req.user as IRequestUser, payload as IRequestIdeaCreate);
+  const data = await ideaServices.createIdea(
+    req.user as IRequestUser,
+    payload as IRequestIdeaCreate,
+  );
   sendResponse(res, {
     success: true,
     statusCode: status.CREATED,
@@ -29,7 +32,26 @@ const createIdea = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllIdeas = catchAsync(async (req: Request, res: Response) => {
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 12);
+
+  const result = await ideaServices.getAllIdeas(page, limit);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "All ideas fetched successfully",
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      total: result.totalPages,
+    },
+  });
+});
+
 export const ideaControllers = {
   changeIdeaStatus,
   createIdea,
+  getAllIdeas,
 };

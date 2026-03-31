@@ -9,5 +9,6 @@ export const ideaStatusChangeSchema = z.object({
 export const ideaCreateSchema = z.object({
   name: z.string().min(5, "Name is required."),
   description: z.string("Description is required."),
+  status: z.enum([IdeaStatus.DRAFT]).optional(),
   categoryId: z.string("Category ID is required."),
 });

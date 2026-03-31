@@ -5,6 +5,7 @@ import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
 import { IRequestUser } from "../../interfaces/user.interface";
 import { IRequestIdeaCreate } from "./idea.interface";
+import { IdeaStatus } from "../../../generated/prisma/enums";
 
 const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
   const isCategoryExist = await prisma.category.findUnique({
@@ -23,6 +24,7 @@ const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
       userId: user.userId,
       imageUrl: payload.imageUrl,
       categoryId: payload.categoryId,
+      status: payload.status || IdeaStatus.PENDING,
     },
   });
   return data;
@@ -51,7 +53,26 @@ const changeIdeaStatus = async (
   return data;
 };
 
+const getAllIdeas = async (page: number, limit: number) => {
+
+  const total = await prisma.idea.count();
+  const totalPages = Math.ceil(total / limit);
+  const data = await prisma.idea.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    select:{
+      id:true,
+      name:true,
+      imageUrl:true,
+      
+      isPaid:true,
+    }
+  });
+  return { totalPages,data};
+};
+
 export const ideaServices = {
   changeIdeaStatus,
   createIdea,
+  getAllIdeas,
 };

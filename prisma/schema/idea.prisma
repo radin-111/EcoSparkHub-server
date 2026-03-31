@@ -6,6 +6,8 @@ model Idea {
     status      IdeaStatus @default(PENDING)
     up_vote     Int        @default(0)
     down_vote   Int        @default(0)
+    isPaid      Boolean    @default(false)
+    price       Float      @default(0.0)
     categoryId  String
     userId      String
     user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)

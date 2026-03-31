@@ -2,8 +2,10 @@ import status from "http-status";
 import { catchAsync } from "../../shared/catchAsync";
 import { services } from "./user.services";
 import { sendResponse } from "../../shared/sendResponse";
+import { Request, Response } from "express";
+import { cookieUtils } from "../../utils/cookie";
 
-const createAdmin = catchAsync(async (req, res, next) => {
+const createAdmin = catchAsync(async (req:Request, res:Response) => {
   const payload = req.body;
   const data = await services.createAdmin(payload);
   sendResponse(res, {
@@ -14,6 +16,21 @@ const createAdmin = catchAsync(async (req, res, next) => {
   });
 });
 
+const getSession = catchAsync(async (req:Request, res:Response) => {
+  
+  const cookie = cookieUtils.getCookie(req, "better-auth.session_token");
+  
+  const data = await services.getSession(cookie);
+
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "Session data fetched successfully",
+    data,
+  });
+});
+
 export const userControllers = {
   createAdmin,
+  getSession,
 };

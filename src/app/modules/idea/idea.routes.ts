@@ -7,6 +7,7 @@ import { ideaCreateSchema, ideaStatusChangeSchema } from "./idea.validation";
 import { multerUpload } from "../../config/multer.config";
 
 const router = Router();
+router.get("/all-ideas",  ideaControllers.getAllIdeas);
 router.post("/create-idea",auth(UserRoles.MEMBER), multerUpload.single("file"), validateData(ideaCreateSchema),ideaControllers.createIdea);
 router.patch(
   "/change-status/:ideaId",

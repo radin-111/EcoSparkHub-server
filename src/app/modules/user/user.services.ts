@@ -5,6 +5,7 @@ import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import { UserRoles } from "../../../generated/prisma/enums";
+import { cookieUtils } from "../../utils/cookie";
 
 const createAdmin = async (payload: z.infer<typeof signUpSchema>) => {
   const data = await auth.api.signUpEmail({
@@ -27,6 +28,22 @@ const createAdmin = async (payload: z.infer<typeof signUpSchema>) => {
   return updateUser;
 };
 
+const getSession = async (sessionToken: string) => {
+  if (!sessionToken) {
+    throw new AppError(status.BAD_REQUEST, "Session token is required");
+  }
+  const session = await prisma.session.findFirst({
+    where: {
+      token: sessionToken,
+    },
+    select: {
+      user: true,
+    },
+  });
+  return session;
+};
+
 export const services = {
   createAdmin,
+  getSession,
 };

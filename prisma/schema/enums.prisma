@@ -4,6 +4,7 @@ enum UserRoles {
 }
 
 enum IdeaStatus {
+    DRAFT
     PENDING
     APPROVED
     REJECTED
