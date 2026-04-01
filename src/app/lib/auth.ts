@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 import { ProfileStatus, UserRoles } from "../../generated/prisma/enums";
 import { envConfig } from "../config/env";
 
-import { bearer, emailOTP } from "better-auth/plugins";
+import { bearer, emailOTP, oAuthProxy } from "better-auth/plugins";
 import { sendEmailOtp } from "../utils/email";
 
 export const auth = betterAuth({
@@ -58,6 +58,8 @@ export const auth = betterAuth({
 
   plugins: [
     bearer(),
+    oAuthProxy(),
+
     emailOTP({
       overrideDefaultEmailVerification: true,
       async sendVerificationOTP({ email, otp, type }) {
