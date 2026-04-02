@@ -49,9 +49,37 @@ const getAllIdeas = catchAsync(async (req: Request, res: Response) => {
     },
   });
 });
+const deleteIdea = catchAsync(async (req: Request, res: Response) => {
+  const { ideaId } = req.params;
+  await ideaServices.deleteIdea(req.user as IRequestUser, ideaId as string);
+  sendResponse(res, {
+    statusCode: status.ACCEPTED,
+    success: true,
+    data: "Idea deleted successfully",
+    message: "Idea deleted successfully",
+  });
+});
+const updateIdea = catchAsync(async (req: Request, res: Response) => {
+  const { ideaId } = req.params;
+  const imageUrl = req.file?.path;
+  const payload = { ...req.body, imageUrl };
+  const data = await ideaServices.updateIdea(
+    req.user as IRequestUser,
+    ideaId as string,
+    payload as IRequestIdeaCreate,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: status.ACCEPTED,
+    message: "Idea updated successfully",
+    data,
+  });
+});
 
 export const ideaControllers = {
+  updateIdea,
   changeIdeaStatus,
   createIdea,
   getAllIdeas,
+  deleteIdea,
 };

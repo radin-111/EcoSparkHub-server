@@ -44,8 +44,6 @@ const signup = async (payload: z.infer<typeof signUpSchema>) => {
 };
 
 const signIn = async (payload: z.infer<typeof signInSchema>) => {
-  
-
   const data = await auth.api.signInEmail({
     body: payload,
   });
@@ -85,8 +83,19 @@ const verifyEmail = async (payload: z.infer<typeof verifyEmailSchema>) => {
   });
   return data;
 };
+
+const logout = async (sessionToken: string) => {
+ 
+  await auth.api.signOut({
+    headers: new Headers({
+      Authorization: `Bearer ${sessionToken}`,
+    }),
+  });
+};
+
 export const authServices = {
   signup,
   signIn,
   verifyEmail,
+  logout,
 };

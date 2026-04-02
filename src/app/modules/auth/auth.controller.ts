@@ -5,6 +5,7 @@ import { tokenUtils } from "../../utils/token";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import AppError from "../../errorHelpers/AppError";
+import { cookieUtils } from "../../utils/cookie";
 
 const signup = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.signup(req.body);
@@ -49,10 +50,28 @@ const signIn = catchAsync(async (req: Request, res: Response) => {
 });
 
 const signOut = catchAsync(async (req: Request, res: Response) => {
+  
+  const token = cookieUtils.getCookie(req, "better-auth.session_token");
+  await authServices.logout(token as string);
+  await cookieUtils.clearCookie(res, "better-auth.session_token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+  await cookieUtils.clearCookie(res, "accessToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+  await cookieUtils.clearCookie(res, "refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
   sendResponse(res, {
     success: true,
     statusCode: status.OK,
-    data: null,
+    data: "Session cleared successfully",
     message: "User signed out successfully",
   });
 });
