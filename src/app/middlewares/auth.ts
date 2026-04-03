@@ -48,7 +48,7 @@ export const auth = (...roles: UserRoles[]) => {
             res.setHeader("X-Session-Expires-At", expiresAt.toISOString());
             res.setHeader("X-Time-Remaining", timeRemaining.toString());
 
-            console.log("Session Expiring Soon!!");
+            
           }
 
           if (roles.length > 0 && !roles.includes(sessionExists.user.role)) {

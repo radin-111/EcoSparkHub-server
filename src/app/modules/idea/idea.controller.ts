@@ -75,9 +75,19 @@ const updateIdea = catchAsync(async (req: Request, res: Response) => {
     data,
   });
 });
+const getDraftIdeas = catchAsync(async (req: Request, res: Response) => {
+  const data = await ideaServices.getDraftIdeas(req.user as IRequestUser);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Draft ideas fetched successfully",
+    data,
+  });
+});
 
 export const ideaControllers = {
   updateIdea,
+  getDraftIdeas,
   changeIdeaStatus,
   createIdea,
   getAllIdeas,

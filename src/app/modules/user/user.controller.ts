@@ -5,7 +5,7 @@ import { sendResponse } from "../../shared/sendResponse";
 import { Request, Response } from "express";
 import { cookieUtils } from "../../utils/cookie";
 
-const createAdmin = catchAsync(async (req:Request, res:Response) => {
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   const data = await services.createAdmin(payload);
   sendResponse(res, {
@@ -16,10 +16,9 @@ const createAdmin = catchAsync(async (req:Request, res:Response) => {
   });
 });
 
-const getSession = catchAsync(async (req:Request, res:Response) => {
-  
+const getSession = catchAsync(async (req: Request, res: Response) => {
   const cookie = cookieUtils.getCookie(req, "better-auth.session_token");
-  
+
   const data = await services.getSession(cookie);
 
   sendResponse(res, {
@@ -30,7 +29,28 @@ const getSession = catchAsync(async (req:Request, res:Response) => {
   });
 });
 
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.userId as string;
+
+  const payload = req.body;
+  if (req.file) {
+    payload.imageUrl = req.file?.path;
+    
+  }
+  
+ 
+
+  const data = await services.updateUser(userId, payload);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "User updated successfully",
+    data,
+  });
+});
+
 export const userControllers = {
   createAdmin,
   getSession,
+  updateUser,
 };

@@ -5,7 +5,7 @@ import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import { UserRoles } from "../../../generated/prisma/enums";
-import { cookieUtils } from "../../utils/cookie";
+import { deleteFileFromCloudinary } from "../../config/cloudinary.config";
 
 const createAdmin = async (payload: z.infer<typeof signUpSchema>) => {
   const data = await auth.api.signUpEmail({
@@ -42,8 +42,36 @@ const getSession = async (sessionToken: string) => {
   });
   return session;
 };
+const updateUser = async (
+  userId: string,
+  payload: { name?: string; imageUrl?: string },
+) => {
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  if (!isUserExist) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
 
+  if (payload.imageUrl && isUserExist?.image) {
+    await deleteFileFromCloudinary(isUserExist.image);
+  }
+ 
+  const updateUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      name: payload.name,
+      image: payload.imageUrl,
+    },
+  });
+  return updateUser;
+};
 export const services = {
+  updateUser,
   createAdmin,
   getSession,
 };

@@ -1,7 +1,7 @@
 import z from "zod";
 import { prisma } from "../../lib/prisma";
 import {
-  ideaCreateSchema,
+  
   ideaStatusChangeSchema,
   ideaUpdateSchema,
 } from "./idea.validation";
@@ -107,6 +107,11 @@ const updateIdea = async (
   if (!isIdeaExist) {
     throw new AppError(status.NOT_FOUND, "Idea not found");
   }
+
+  if (payload.imageUrl && isIdeaExist?.imageUrl) {
+    await deleteFileFromCloudinary(isIdeaExist.imageUrl);
+  }
+
   const data = await prisma.idea.update({
     where: {
       id: ideaId,
@@ -120,11 +125,21 @@ const updateIdea = async (
   });
   return data;
 };
+const getDraftIdeas = async (user: IRequestUser) => {
+  const data = await prisma.idea.findMany({
+    where: {
+      userId: user.userId,
+      status: IdeaStatus.DRAFT,
+    },
+  });
+  return data;
+};
 
 export const ideaServices = {
   changeIdeaStatus,
   deleteIdea,
   createIdea,
+  getDraftIdeas,
   updateIdea,
   getAllIdeas,
 };

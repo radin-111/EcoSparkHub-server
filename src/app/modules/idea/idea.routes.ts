@@ -5,13 +5,14 @@ import { UserRoles } from "../../../generated/prisma/enums";
 import { validateData } from "../../middlewares/validateData";
 import { ideaCreateSchema, ideaStatusChangeSchema, ideaUpdateSchema } from "./idea.validation";
 import { multerUpload } from "../../config/multer.config";
-import { updateFileUploader } from "../../middlewares/updateFileUploader";
+
 
 const router = Router();
 
 
 
 router.get("/all-ideas", ideaControllers.getAllIdeas);
+router.get("/my-drafts",auth(UserRoles.MEMBER), ideaControllers.getDraftIdeas);
 router.post(
   "/create-idea",
   auth(UserRoles.MEMBER),
@@ -22,14 +23,13 @@ router.post(
 router.patch(
   "/change-status/:ideaId",
   auth(UserRoles.ADMIN),
-  validateData(ideaStatusChangeSchema),
-  updateFileUploader,
+  validateData(ideaStatusChangeSchema),  
   ideaControllers.changeIdeaStatus,
 );
 router.patch(
   "/update-idea/:ideaId",
   auth(UserRoles.MEMBER),
-  updateFileUploader,
+  multerUpload.single("file"),
   validateData(ideaUpdateSchema),
   ideaControllers.updateIdea,
 );

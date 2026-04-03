@@ -4,6 +4,7 @@ import { envConfig } from "../config/env";
 import z from "zod";
 import { handleZodError } from "../errorHelpers/handleZodError";
 import AppError from "../errorHelpers/AppError";
+import { deleteFileFromCloudinary } from "../config/cloudinary.config";
 
 export const globalErrorHandler = async (
   error: any,
@@ -15,7 +16,9 @@ export const globalErrorHandler = async (
   let statusCode: any = status.INTERNAL_SERVER_ERROR;
   let stack = "";
   let errorSources: any = [];
-
+if(req.file){
+  await deleteFileFromCloudinary(req.file.path);
+}
   if (error instanceof z.ZodError) {
     const zodErrorResponse = handleZodError(error);
     errorMessage = zodErrorResponse.message;
