@@ -20,6 +20,7 @@ const changeIdeaStatus = catchAsync(async (req: Request, res: Response) => {
 const createIdea = catchAsync(async (req: Request, res: Response) => {
   const imageUrl = req.file?.path;
   const payload = { ...req.body, imageUrl };
+  
   const data = await ideaServices.createIdea(
     req.user as IRequestUser,
     payload as IRequestIdeaCreate,
@@ -84,6 +85,15 @@ const getDraftIdeas = catchAsync(async (req: Request, res: Response) => {
     data,
   });
 });
+const getMyIdeas = catchAsync(async (req: Request, res: Response) => {
+  const data = await ideaServices.getMyIdeas(req.user as IRequestUser);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "My ideas fetched successfully",
+    data,
+  });
+});
 
 export const ideaControllers = {
   updateIdea,
@@ -92,4 +102,5 @@ export const ideaControllers = {
   createIdea,
   getAllIdeas,
   deleteIdea,
+  getMyIdeas,
 };

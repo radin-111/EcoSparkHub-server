@@ -13,6 +13,7 @@ const router = Router();
 
 router.get("/all-ideas", ideaControllers.getAllIdeas);
 router.get("/my-drafts",auth(UserRoles.MEMBER), ideaControllers.getDraftIdeas);
+router.get("/my-ideas",auth(UserRoles.MEMBER), ideaControllers.getMyIdeas);
 router.post(
   "/create-idea",
   auth(UserRoles.MEMBER),

@@ -12,7 +12,7 @@ export const ideaCreateSchema = z.object({
   status: z.enum([IdeaStatus.DRAFT, IdeaStatus.PENDING]),
   categoryId: z.string("Category ID is required."),
   isPaid: z.boolean().optional(),
-  price: z.float64().optional(),
+  price: z.float64().optional().nullable(),
 });
 
 export const ideaUpdateSchema = z

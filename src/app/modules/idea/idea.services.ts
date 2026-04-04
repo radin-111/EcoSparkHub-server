@@ -1,10 +1,6 @@
 import z from "zod";
 import { prisma } from "../../lib/prisma";
-import {
-  
-  ideaStatusChangeSchema,
-  ideaUpdateSchema,
-} from "./idea.validation";
+import { ideaStatusChangeSchema, ideaUpdateSchema } from "./idea.validation";
 import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
 import { IRequestUser } from "../../interfaces/user.interface";
@@ -22,16 +18,31 @@ const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
     throw new AppError(status.NOT_FOUND, "Category not found");
   }
 
-  
-  
   const data = await prisma.idea.create({
     data: {
       name: payload.name,
       description: payload.description,
       userId: user.userId,
       imageUrl: payload.imageUrl,
+      isPaid: payload.isPaid,
+      price: payload.price || 0.0,
       categoryId: payload.categoryId,
       status: payload.status,
+    },
+  });
+  return data;
+};
+
+const getMyIdeas = async (user: IRequestUser) => {
+  const data = await prisma.idea.findMany({
+    where: {
+      userId: user.userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      imageUrl: true,
+      isPaid: true,
     },
   });
   return data;
@@ -66,6 +77,9 @@ const getAllIdeas = async (page: number, limit: number) => {
   const data = await prisma.idea.findMany({
     skip: (page - 1) * limit,
     take: limit,
+    where: {
+      status: IdeaStatus.APPROVED,
+    },
     select: {
       id: true,
       name: true,
@@ -144,4 +158,5 @@ export const ideaServices = {
   getDraftIdeas,
   updateIdea,
   getAllIdeas,
+  getMyIdeas,
 };
