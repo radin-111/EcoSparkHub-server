@@ -9,8 +9,10 @@ export const ideaStatusChangeSchema = z.object({
 export const ideaCreateSchema = z.object({
   name: z.string().min(5, "Name is required."),
   description: z.string("Description is required."),
-  status: z.enum([IdeaStatus.DRAFT]).optional(),
+  status: z.enum([IdeaStatus.DRAFT, IdeaStatus.PENDING]),
   categoryId: z.string("Category ID is required."),
+  isPaid: z.boolean().optional(),
+  price: z.float64().optional(),
 });
 
 export const ideaUpdateSchema = z

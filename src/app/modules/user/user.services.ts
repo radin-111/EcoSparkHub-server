@@ -58,7 +58,7 @@ const updateUser = async (
   if (payload.imageUrl && isUserExist?.image) {
     await deleteFileFromCloudinary(isUserExist.image);
   }
- 
+
   const updateUser = await prisma.user.update({
     where: {
       id: userId,

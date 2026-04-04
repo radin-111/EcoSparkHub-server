@@ -22,6 +22,8 @@ const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
     throw new AppError(status.NOT_FOUND, "Category not found");
   }
 
+  
+  
   const data = await prisma.idea.create({
     data: {
       name: payload.name,
@@ -29,7 +31,7 @@ const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
       userId: user.userId,
       imageUrl: payload.imageUrl,
       categoryId: payload.categoryId,
-      status: payload.status || IdeaStatus.PENDING,
+      status: payload.status,
     },
   });
   return data;

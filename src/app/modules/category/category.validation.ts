@@ -7,7 +7,7 @@ export const categoryValidationSchema = z.object({
 
 export const categoryUpdateValidationSchema = z
   .object({
-    name: z.string().min(3, "Category name is required"),
-    description: z.string(),
+    name: z.string().min(3, "Category name is required").optional(),
+    description: z.string().optional(),
   })
   .partial();
