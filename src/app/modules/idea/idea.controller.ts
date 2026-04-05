@@ -109,8 +109,26 @@ const getMyIdeas = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getApprovedAndRejectedIdeas = catchAsync(async (req: Request, res: Response) => {
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 12);
+  const result = await ideaServices.getApprovedAndRejectedIdeas(page, limit);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Approved and rejected ideas fetched successfully",
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      totalPages: result.totalPages,
+    },
+  });
+});
+
 export const ideaControllers = {
   updateIdea,
+  getApprovedAndRejectedIdeas,
   getDraftIdeas,
   changeIdeaStatus,
   createIdea,

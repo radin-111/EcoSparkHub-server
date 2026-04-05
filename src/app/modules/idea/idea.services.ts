@@ -46,11 +46,8 @@ const getMyIdeas = async (user: IRequestUser, page: number, limit: number) => {
     where: {
       userId: user.userId,
     },
-    select: {
-      id: true,
-      name: true,
-      imageUrl: true,
-      isPaid: true,
+    orderBy: {
+      createdAt: "desc",
     },
   });
   return { totalPages, data };
@@ -94,6 +91,9 @@ const getAllIdeas = async (page: number, limit: number) => {
       imageUrl: true,
 
       isPaid: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
   return { totalPages, data };
@@ -149,11 +149,17 @@ const updateIdea = async (
   });
   return data;
 };
-const getDraftIdeas = async (user: IRequestUser, page: number, limit: number) => {
+const getDraftIdeas = async (
+  user: IRequestUser,
+  page: number,
+  limit: number,
+) => {
   const total = await prisma.idea.count({
     where: {
       userId: user.userId,
+      status: IdeaStatus.DRAFT,
     },
+   
   });
   const totalPages = Math.ceil(total / limit);
 
@@ -164,6 +170,37 @@ const getDraftIdeas = async (user: IRequestUser, page: number, limit: number) =>
       userId: user.userId,
       status: IdeaStatus.DRAFT,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return { totalPages, data };
+};
+
+
+const getApprovedAndRejectedIdeas = async (
+  page: number,
+  limit: number,
+) => {
+  const total = await prisma.idea.count({
+    where: {
+      status: {
+        in: [IdeaStatus.APPROVED, IdeaStatus.REJECTED],
+      },
+    },
+  });
+  const totalPages = Math.ceil(total / limit);
+  const data = await prisma.idea.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    where: {
+      status: {
+        in: [IdeaStatus.APPROVED, IdeaStatus.REJECTED],
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
   return { totalPages, data };
 };
@@ -172,6 +209,7 @@ export const ideaServices = {
   changeIdeaStatus,
   deleteIdea,
   createIdea,
+  getApprovedAndRejectedIdeas,
   getDraftIdeas,
   updateIdea,
   getAllIdeas,
