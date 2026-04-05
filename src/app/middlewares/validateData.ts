@@ -6,9 +6,13 @@ export const validateData =  (zodSchema: z.ZodObject) => {
     
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);
+      if(req.body.price){
+        req.body.price = parseFloat(req.body.price);
+      }
     }
     
     const parsedData = zodSchema.safeParse(req.body);
+    
     if (!parsedData.success) {
       next(parsedData.error);
     }

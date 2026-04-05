@@ -8,7 +8,7 @@ interface IResponse<T> {
   meta?: {
     page: number;
     limit: number;
-    total: number;
+    totalPages: number;
   };
 }
 

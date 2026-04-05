@@ -33,8 +33,16 @@ const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
   return data;
 };
 
-const getMyIdeas = async (user: IRequestUser) => {
+const getMyIdeas = async (user: IRequestUser, page: number, limit: number) => {
+  const total = await prisma.idea.count({
+    where: {
+      userId: user.userId,
+    },
+  });
+  const totalPages = Math.ceil(total / limit);
   const data = await prisma.idea.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
     where: {
       userId: user.userId,
     },
@@ -45,7 +53,7 @@ const getMyIdeas = async (user: IRequestUser) => {
       isPaid: true,
     },
   });
-  return data;
+  return { totalPages, data };
 };
 
 const changeIdeaStatus = async (
@@ -141,14 +149,23 @@ const updateIdea = async (
   });
   return data;
 };
-const getDraftIdeas = async (user: IRequestUser) => {
+const getDraftIdeas = async (user: IRequestUser, page: number, limit: number) => {
+  const total = await prisma.idea.count({
+    where: {
+      userId: user.userId,
+    },
+  });
+  const totalPages = Math.ceil(total / limit);
+
   const data = await prisma.idea.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
     where: {
       userId: user.userId,
       status: IdeaStatus.DRAFT,
     },
   });
-  return data;
+  return { totalPages, data };
 };
 
 export const ideaServices = {

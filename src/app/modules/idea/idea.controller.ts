@@ -46,7 +46,7 @@ const getAllIdeas = catchAsync(async (req: Request, res: Response) => {
     meta: {
       page,
       limit,
-      total: result.totalPages,
+      totalPages: result.totalPages,
     },
   });
 });
@@ -77,21 +77,35 @@ const updateIdea = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getDraftIdeas = catchAsync(async (req: Request, res: Response) => {
-  const data = await ideaServices.getDraftIdeas(req.user as IRequestUser);
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 12);
+  const result = await ideaServices.getDraftIdeas(req.user as IRequestUser, page, limit);
   sendResponse(res, {
     success: true,
     statusCode: status.OK,
     message: "Draft ideas fetched successfully",
-    data,
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      totalPages: result.totalPages,
+    },
   });
 });
 const getMyIdeas = catchAsync(async (req: Request, res: Response) => {
-  const data = await ideaServices.getMyIdeas(req.user as IRequestUser);
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 12);
+  const result = await ideaServices.getMyIdeas(req.user as IRequestUser, page, limit);
   sendResponse(res, {
     success: true,
     statusCode: status.OK,
     message: "My ideas fetched successfully",
-    data,
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      totalPages: result.totalPages,
+    },
   });
 });
 
