@@ -125,7 +125,22 @@ const getApprovedAndRejectedIdeas = catchAsync(async (req: Request, res: Respons
     },
   });
 });
-
+const pendingIdeas = catchAsync(async (req: Request, res: Response) => {
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 12);
+  const result = await ideaServices.pendingIdeas(page, limit);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Pending ideas fetched successfully",
+    data: result.data,
+    meta: {
+      page,
+      limit,
+      totalPages: result.totalPages,
+    },
+  });
+});
 export const ideaControllers = {
   updateIdea,
   getApprovedAndRejectedIdeas,
@@ -135,4 +150,5 @@ export const ideaControllers = {
   getAllIdeas,
   deleteIdea,
   getMyIdeas,
+  pendingIdeas,
 };

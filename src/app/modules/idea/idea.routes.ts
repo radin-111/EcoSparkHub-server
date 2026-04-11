@@ -20,6 +20,11 @@ router.get(
   auth(UserRoles.ADMIN),
   ideaControllers.getApprovedAndRejectedIdeas,
 );
+router.get(
+  "/pending-ideas",
+  auth(UserRoles.ADMIN),
+  ideaControllers.pendingIdeas,
+);
 router.post(
   "/create-idea",
   auth(UserRoles.MEMBER),

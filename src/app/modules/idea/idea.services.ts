@@ -205,6 +205,28 @@ const getApprovedAndRejectedIdeas = async (
   return { totalPages, data };
 };
 
+
+
+const pendingIdeas = async (page: number, limit: number) => {
+  const total = await prisma.idea.count({
+    where: {
+      status: IdeaStatus.PENDING,
+    },
+  });
+  const totalPages = Math.ceil(total / limit);
+  const data = await prisma.idea.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    where: {
+      status: IdeaStatus.PENDING,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return { totalPages, data };
+};
+
 export const ideaServices = {
   changeIdeaStatus,
   deleteIdea,
@@ -214,4 +236,5 @@ export const ideaServices = {
   updateIdea,
   getAllIdeas,
   getMyIdeas,
+  pendingIdeas,
 };
