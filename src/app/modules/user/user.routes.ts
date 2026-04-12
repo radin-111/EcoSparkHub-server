@@ -11,7 +11,7 @@ import { multerUpload } from "../../config/multer.config";
 const router = Router();
 router.patch(
   "/update-user",
-  auth(UserRoles.MEMBER),
+  auth(UserRoles.MEMBER, UserRoles.ADMIN),
   multerUpload.single("file"),
   validateData(userUpdateSchema),
   
