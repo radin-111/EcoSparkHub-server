@@ -35,10 +35,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   if (req.file) {
     payload.imageUrl = req.file?.path;
-    
   }
-  
- 
 
   const data = await services.updateUser(userId, payload);
   sendResponse(res, {
@@ -49,8 +46,26 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const result = await services.getAllUsers(page, limit);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "All users fetched successfully",
+    data: result.data,
+    meta: {
+      totalPages: result.totalPages,
+      page,
+      limit,
+    },
+  });
+});
+
 export const userControllers = {
   createAdmin,
+  getAllUsers,
   getSession,
   updateUser,
 };

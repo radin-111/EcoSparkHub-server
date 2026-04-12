@@ -9,6 +9,8 @@ import { userUpdateSchema } from "./user.validation";
 import { multerUpload } from "../../config/multer.config";
 
 const router = Router();
+router.get("/all-users", auth(UserRoles.ADMIN), userControllers.getAllUsers);
+router.get("/get-session", userControllers.getSession);
 router.patch(
   "/update-user",
   auth(UserRoles.MEMBER, UserRoles.ADMIN),
@@ -18,7 +20,8 @@ router.patch(
 
   userControllers.updateUser,
 );
-router.get("/get-session", userControllers.getSession);
+
+
 router.post(
   "/create-admin",
   auth(UserRoles.ADMIN),

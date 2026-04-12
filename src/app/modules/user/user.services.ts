@@ -70,8 +70,21 @@ const updateUser = async (
   });
   return updateUser;
 };
+
+const getAllUsers = async (page: number, limit: number) => {
+  const total = await prisma.user.count();
+  const totalPages = Math.ceil(total / limit);
+  const data = await prisma.user.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    
+  });
+  return { totalPages, data };
+};
+
 export const services = {
   updateUser,
   createAdmin,
+  getAllUsers,
   getSession,
 };
