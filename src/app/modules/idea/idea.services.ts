@@ -77,7 +77,11 @@ const changeIdeaStatus = async (
 };
 
 const getAllIdeas = async (page: number, limit: number) => {
-  const total = await prisma.idea.count();
+  const total = await prisma.idea.count({
+    where: {
+      status: IdeaStatus.APPROVED,
+    },
+  });
   const totalPages = Math.ceil(total / limit);
   const data = await prisma.idea.findMany({
     skip: (page - 1) * limit,
@@ -89,7 +93,9 @@ const getAllIdeas = async (page: number, limit: number) => {
       id: true,
       name: true,
       imageUrl: true,
-
+      up_vote: true,
+      down_vote: true,
+      createdAt: true,
       isPaid: true,
     },
     orderBy: {
@@ -159,7 +165,6 @@ const getDraftIdeas = async (
       userId: user.userId,
       status: IdeaStatus.DRAFT,
     },
-   
   });
   const totalPages = Math.ceil(total / limit);
 
@@ -177,11 +182,7 @@ const getDraftIdeas = async (
   return { totalPages, data };
 };
 
-
-const getApprovedAndRejectedIdeas = async (
-  page: number,
-  limit: number,
-) => {
+const getApprovedAndRejectedIdeas = async (page: number, limit: number) => {
   const total = await prisma.idea.count({
     where: {
       status: {
@@ -204,8 +205,6 @@ const getApprovedAndRejectedIdeas = async (
   });
   return { totalPages, data };
 };
-
-
 
 const pendingIdeas = async (page: number, limit: number) => {
   const total = await prisma.idea.count({

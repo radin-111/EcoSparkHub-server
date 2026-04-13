@@ -15,6 +15,9 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+app.post("/webhook",express.raw({type:"application/json"}))
+
 app.use("/api/v1", indexRoutes);
 app.get("/", (req, res) => {
   res.send("Ideas are here!");
