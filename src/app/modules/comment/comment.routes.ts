@@ -11,6 +11,15 @@ import {
 } from "./comment.validation";
 
 const router = Router();
+
+
+router.get(
+  "/:ideaId",
+  commentControllers.getIdeaComments,
+);
+
+
+
 router.post(
   "/create-comment",
   auth(UserRoles.MEMBER, UserRoles.ADMIN),

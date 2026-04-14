@@ -25,6 +25,10 @@ router.get(
   auth(UserRoles.ADMIN),
   ideaControllers.pendingIdeas,
 );
+router.get(
+  "/:ideaId",
+  ideaControllers.singleIdea,
+);
 router.post(
   "/create-idea",
   auth(UserRoles.MEMBER),

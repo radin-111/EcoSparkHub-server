@@ -6,7 +6,7 @@ import { IRequestUser } from "../../interfaces/user.interface";
 import { Request, Response } from "express";
 
 const createReply = catchAsync(async (req: Request, res: Response) => {
-  const { reply } = req.body;
+  const  reply  = req.body;
   const result = await replyServices.createReply(
     req.user as IRequestUser,
     reply,

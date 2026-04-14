@@ -141,11 +141,27 @@ const pendingIdeas = catchAsync(async (req: Request, res: Response) => {
     },
   });
 });
+
+const singleIdea = catchAsync(async (req: Request, res: Response) => {
+  const { ideaId } = req.params;
+  const data = await ideaServices.singleIdea(ideaId as string);
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Idea fetched successfully",
+    data,
+  });
+});
+
+
+
+
 export const ideaControllers = {
   updateIdea,
   getApprovedAndRejectedIdeas,
   getDraftIdeas,
   changeIdeaStatus,
+  singleIdea,
   createIdea,
   getAllIdeas,
   deleteIdea,

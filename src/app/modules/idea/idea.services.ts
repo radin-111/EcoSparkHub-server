@@ -226,11 +226,26 @@ const pendingIdeas = async (page: number, limit: number) => {
   return { totalPages, data };
 };
 
+const singleIdea = async (ideaId: string) => {
+  const data = await prisma.idea.findUnique({
+    where: {
+      id: ideaId,
+    },
+  });
+  if (!data) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  return data;
+};
+
+
+
 export const ideaServices = {
   changeIdeaStatus,
   deleteIdea,
   createIdea,
   getApprovedAndRejectedIdeas,
+  singleIdea,
   getDraftIdeas,
   updateIdea,
   getAllIdeas,

@@ -44,6 +44,17 @@ const updateComment = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getIdeaComments = catchAsync(async (req: Request, res: Response) => {
+  const result = await commentServices.getIdeaComments(
+    req.params.ideaId as string,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Comments fetched successfully",
+    data: result,
+  });
+});
 
 
-export const commentControllers = { createComment, deleteComment, updateComment };
+export const commentControllers = { createComment, deleteComment, updateComment, getIdeaComments };

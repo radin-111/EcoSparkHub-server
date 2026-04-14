@@ -84,4 +84,21 @@ const updateComment = async (
   return result;
 };
 
-export const commentServices = { createComment, deleteComment, updateComment };
+const getIdeaComments = async (ideaId: string) => {
+  const result = await prisma.comment.findMany({
+    where: {
+      ideaId,
+    },
+    include:{
+      replies:true,
+    }
+    
+  });
+  return result;
+};
+
+
+
+
+
+export const commentServices = { createComment, deleteComment, updateComment, getIdeaComments };
