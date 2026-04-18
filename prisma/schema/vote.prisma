@@ -1,0 +1,8 @@
+model Vote {
+    id       String  @id @default(uuid())
+    userId   String
+    ideaId   String
+    isUpVote Boolean
+    user     User    @relation(fields: [userId], references: [id])
+    idea     Idea    @relation(fields: [ideaId], references: [id])
+}

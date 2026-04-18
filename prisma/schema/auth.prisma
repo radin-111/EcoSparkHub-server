@@ -16,6 +16,7 @@ model User {
   comments           Comment[]
   replies            Reply[]
   ideas              Idea[]
+  votes              Vote[]
 
   @@unique([email])
   @@map("user")

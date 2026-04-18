@@ -4,11 +4,13 @@ import { indexRoutes } from "./app/routes";
 import { notFound } from "./app/middlewares/notfound";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
 import cookieParser from "cookie-parser";
+import { envConfig } from "./app/config/env";
+
 
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: envConfig.APP_URL,
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
   credentials: true,

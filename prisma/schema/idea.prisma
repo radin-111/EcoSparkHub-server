@@ -7,13 +7,15 @@ model Idea {
     up_vote     Int        @default(0)
     down_vote   Int        @default(0)
     isPaid      Boolean    @default(false)
-    price       Float      
+    price       Float
     categoryId  String
     userId      String
     user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    category Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    comments Comment[]
+    category  Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    comments  Comment[]
+    votes     Vote[]
 }
+

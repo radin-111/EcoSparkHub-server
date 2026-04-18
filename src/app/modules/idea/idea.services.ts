@@ -237,9 +237,100 @@ const singleIdea = async (ideaId: string) => {
   }
   return data;
 };
+const upVote = async (user: IRequestUser, ideaId: string) => {
+  const isIdeaExist = await prisma.idea.findUnique({
+    where: {
+      id: ideaId,
+    },
+  });
+  if (!isIdeaExist) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  const isVoted = await prisma.vote.findFirst({
+    where: {
+      userId: user.userId,
+      ideaId,
+    },
+  });
+  if (isVoted) {
+    throw new AppError(status.BAD_REQUEST, "You have already voted");
+  }
 
+  const data = await prisma.$transaction(async (tx) => {
+    await tx.idea.update({
+      where: {
+        id: ideaId,
+      },
+      data: {
+        up_vote: {
+          increment: 1,
+        },
+      },
+    });
 
+    await tx.vote.create({
+      data: {
+        ideaId,
+        userId: user.userId,
+        isUpVote: true,
+      },
+    });
+  });
+  return data;
+};
+const downVote = async (user: IRequestUser, ideaId: string) => {
+  const isIdeaExist = await prisma.idea.findUnique({
+    where: {
+      id: ideaId,
+    },
+  });
+  if (!isIdeaExist) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  const isVoted = await prisma.vote.findFirst({
+    where: {
+      userId: user.userId,
+      ideaId,
+    },
+  });
+  if (isVoted) {
+    throw new AppError(status.BAD_REQUEST, "You have already voted");
+  }
 
+  const data = await prisma.$transaction(async (tx) => {
+    await tx.idea.update({
+      where: {
+        id: ideaId,
+      },
+      data: {
+        down_vote: {
+          increment: 1,
+        },
+      },
+    });
+
+    await tx.vote.create({
+      data: {
+        ideaId,
+        userId: user.userId,
+        isUpVote: false,
+      },
+    });
+  });
+  return data;
+};
+const votedIdea = async (user: IRequestUser, ideaId: string) => {
+  const isVoted = await prisma.vote.findFirst({
+    where: {
+      userId: user.userId,
+      ideaId,
+    },
+  });
+  if (isVoted) {
+    return isVoted;
+  }
+  return null;
+};
 export const ideaServices = {
   changeIdeaStatus,
   deleteIdea,
@@ -249,6 +340,9 @@ export const ideaServices = {
   getDraftIdeas,
   updateIdea,
   getAllIdeas,
+  votedIdea,
+  upVote,
+  downVote,
   getMyIdeas,
   pendingIdeas,
 };

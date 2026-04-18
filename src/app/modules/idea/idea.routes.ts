@@ -25,10 +25,14 @@ router.get(
   auth(UserRoles.ADMIN),
   ideaControllers.pendingIdeas,
 );
-router.get(
-  "/:ideaId",
-  ideaControllers.singleIdea,
+router.get("/voted/:ideaId", auth(UserRoles.MEMBER, UserRoles.ADMIN), ideaControllers.votedIdea);
+router.post("/up-vote/:ideaId", auth(UserRoles.MEMBER), ideaControllers.upVote);
+router.post(
+  "/down-vote/:ideaId",
+  auth(UserRoles.MEMBER),
+  ideaControllers.downVote,
 );
+router.get("/:ideaId", ideaControllers.singleIdea);
 router.post(
   "/create-idea",
   auth(UserRoles.MEMBER),
