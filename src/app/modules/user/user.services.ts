@@ -21,7 +21,7 @@ const createAdmin = async (payload: z.infer<typeof signUpSchema>) => {
     },
     data: {
       role: UserRoles.ADMIN,
-      needPasswordChange: true,
+      // needPasswordChange: true,
     },
   });
 
@@ -82,9 +82,29 @@ const getAllUsers = async (page: number, limit: number) => {
   return { totalPages, data };
 };
 
+const getAllAdmins = async (page: number, limit: number) => {
+  const total = await prisma.user.count({
+    where: {
+      role: UserRoles.ADMIN,
+    },
+  });
+  const totalPages = Math.ceil(total / limit);
+  const data = await prisma.user.findMany({
+    where: {
+      role: UserRoles.ADMIN,
+    },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+  return { totalPages, data };
+};
+
+
+
 export const services = {
   updateUser,
   createAdmin,
   getAllUsers,
+  getAllAdmins,
   getSession,
 };

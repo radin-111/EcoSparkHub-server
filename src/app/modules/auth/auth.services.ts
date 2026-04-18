@@ -81,6 +81,8 @@ const verifyEmail = async (payload: z.infer<typeof verifyEmailSchema>) => {
       otp: payload.otp,
     },
   });
+
+  
 const accessToken = tokenUtils.getAccessToken({
     userId: data.user.id,
     role: data.user.role,

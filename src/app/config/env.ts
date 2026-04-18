@@ -6,6 +6,9 @@ dotenv.config();
 
 interface allEnv {
   DATABASE_URL: string;
+  ADMIN_NAME: string;
+  ADMIN_EMAIL: string;
+  ADMIN_PASSWORD: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   PORT: string;
@@ -79,6 +82,9 @@ const loadEnv = (): allEnv => {
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET as string,
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET as string,
     NODE_ENV: process.env.NODE_ENV as string,
+    ADMIN_NAME: process.env.ADMIN_NAME as string,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL as string,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD as string,
     ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
     REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
     CLOUDINARY:{

@@ -63,8 +63,29 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getAllAdmins = catchAsync(async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const result = await services.getAllAdmins(page, limit);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "All admins fetched successfully",
+    data: result.data,
+    meta: {
+      totalPages: result.totalPages,
+      page,
+      limit,
+    },
+  });
+});
+
+
+
 export const userControllers = {
   createAdmin,
+  getAllAdmins,
   getAllUsers,
   getSession,
   updateUser,

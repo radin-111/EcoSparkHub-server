@@ -11,6 +11,7 @@ import { multerUpload } from "../../config/multer.config";
 const router = Router();
 router.get("/all-users", auth(UserRoles.ADMIN), userControllers.getAllUsers);
 router.get("/get-session", userControllers.getSession);
+router.get("/all-admins", auth(UserRoles.ADMIN), userControllers.getAllAdmins);
 router.patch(
   "/update-user",
   auth(UserRoles.MEMBER, UserRoles.ADMIN),
