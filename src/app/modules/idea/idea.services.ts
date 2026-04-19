@@ -151,6 +151,8 @@ const updateIdea = async (
       description: payload.description,
       imageUrl: payload.imageUrl,
       categoryId: payload.categoryId,
+      isPaid: payload.isPaid,
+      price: payload.price || 0.0,
     },
   });
   return data;
@@ -241,6 +243,7 @@ const upVote = async (user: IRequestUser, ideaId: string) => {
   const isIdeaExist = await prisma.idea.findUnique({
     where: {
       id: ideaId,
+      status: IdeaStatus.APPROVED,
     },
   });
   if (!isIdeaExist) {
@@ -281,6 +284,7 @@ const upVote = async (user: IRequestUser, ideaId: string) => {
 const downVote = async (user: IRequestUser, ideaId: string) => {
   const isIdeaExist = await prisma.idea.findUnique({
     where: {
+      status: IdeaStatus.APPROVED,
       id: ideaId,
     },
   });
@@ -323,6 +327,7 @@ const votedIdea = async (user: IRequestUser, ideaId: string) => {
   const isVoted = await prisma.vote.findFirst({
     where: {
       userId: user.userId,
+      
       ideaId,
     },
   });
