@@ -17,12 +17,11 @@ model User {
   replies            Reply[]
   ideas              Idea[]
   votes              Vote[]
+  payments           Payment[]
 
   @@unique([email])
   @@map("user")
 }
-
-
 
 model Session {
   id        String   @id
@@ -71,3 +70,5 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+

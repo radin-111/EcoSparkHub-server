@@ -13,3 +13,9 @@ enum ProfileStatus {
     ACTIVE
     INACTIVE
 }
+
+
+enum PaymentStatus {
+    PAID
+    UNPAID
+}

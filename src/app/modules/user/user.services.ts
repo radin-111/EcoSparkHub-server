@@ -6,6 +6,7 @@ import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import { UserRoles } from "../../../generated/prisma/enums";
 import { deleteFileFromCloudinary } from "../../config/cloudinary.config";
+import { sendEmail } from "../../utils/email";
 
 const createAdmin = async (payload: z.infer<typeof signUpSchema>) => {
   const data = await auth.api.signUpEmail({
@@ -22,6 +23,17 @@ const createAdmin = async (payload: z.infer<typeof signUpSchema>) => {
     data: {
       role: UserRoles.ADMIN,
       // needPasswordChange: true,
+    },
+  });
+
+  await sendEmail({
+    to: data.user.email,
+    subject: "Welcome to our platform",
+    templateName: "admin",
+    templateData: {
+      email: data.user.email,
+      name: data.user.name,
+      password: payload.password,
     },
   });
 
@@ -77,7 +89,6 @@ const getAllUsers = async (page: number, limit: number) => {
   const data = await prisma.user.findMany({
     skip: (page - 1) * limit,
     take: limit,
-    
   });
   return { totalPages, data };
 };
@@ -98,8 +109,6 @@ const getAllAdmins = async (page: number, limit: number) => {
   });
   return { totalPages, data };
 };
-
-
 
 export const services = {
   updateUser,

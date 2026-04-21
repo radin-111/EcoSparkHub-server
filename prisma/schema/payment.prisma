@@ -1,3 +1,16 @@
 model Payment {
-  id Int @id @default(autoincrement())
+  id          String        @id @default(uuid())
+  amount      Float
+  currency    String
+  status      PaymentStatus @default(UNPAID)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userId      String
+  paymentData Json
+  ideaId      String
+  user        User          @relation(fields: [userId], references: [id])
+  idea        Idea          @relation(fields: [ideaId], references: [id])
+
+  @@index([userId])
+  @@index([ideaId])
 }

@@ -5,7 +5,8 @@ import { ProfileStatus, UserRoles } from "../../generated/prisma/enums";
 import { envConfig } from "../config/env";
 
 import { bearer, emailOTP, oAuthProxy } from "better-auth/plugins";
-import { sendEmailOtp } from "../utils/email";
+import { sendEmail } from "../utils/email";
+
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -74,7 +75,7 @@ export const auth = betterAuth({
           }
 
           if (!user?.emailVerified) {
-            sendEmailOtp({
+            sendEmail({
               to: email,
               subject: "Verify your email",
               templateName: "otp",

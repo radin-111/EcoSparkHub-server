@@ -17,5 +17,6 @@ model Idea {
     updatedAt DateTime  @updatedAt
     comments  Comment[]
     votes     Vote[]
+    payments  Payment[]
 }
 
