@@ -79,6 +79,41 @@ const handlerStripeWebhookEvent = async (event: Stripe.Event) => {
   }
 };
 
+const getMyTransactions = async (
+  userId: string,
+  page: number,
+  limit: number,
+) => {
+  const total = await prisma.payment.count({
+    where: {
+      userId,
+    },
+  });
+  const totalPages = Math.ceil(total / limit);
+
+  const transactions = await prisma.payment.findMany({
+    where: {
+      userId,
+    },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+  return { transactions, totalPages };
+};
+
+const getAllTransactions = async (page: number, limit: number) => {
+  const total = await prisma.payment.count();
+  const totalPages = Math.ceil(total / limit);
+
+  const transactions = await prisma.payment.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+  return { transactions, totalPages };
+};
+
 export const paymentServices = {
   handlerStripeWebhookEvent,
+  getMyTransactions,
+  getAllTransactions,
 };
