@@ -1,180 +1,84 @@
 import Stripe from "stripe";
 import { prisma } from "../../lib/prisma";
+import status from "http-status";
+import AppError from "../../errorHelpers/AppError";
+import { PaymentStatus } from "../../../generated/prisma/enums";
 
-// const handlerStripeWebhookEvent = async (event: Stripe.Event) => {
-//   const existingPayment = await prisma.payment.findFirst({
-//     where: {
-//       stripeEventId: event.id,
-//     },
-//   });
+const handlerStripeWebhookEvent = async (event: Stripe.Event) => {
+  try {
+    const isPaymentExists = await prisma.payment.findUnique({
+      where: {
+        stripeEventId: event.id,
+      },
+    });
+    if (isPaymentExists) {
+      throw new AppError(status.BAD_REQUEST, "Payment already processed");
+    }
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as any;
 
-//   if (existingPayment) {
-//     console.log(`Event ${event.id} already processed. Skipping`);
-//     return { message: `Event ${event.id} already processed. Skipping` };
-//   }
+        const paymentId = session.metadata?.paymentId;
 
-//   switch (event.type) {
-//     case "checkout.session.completed": {
-//       const session = event.data.object as any;
+        if (!paymentId) {
+          throw new AppError(status.BAD_REQUEST, "Missing metadata");
+        }
 
-//       const appointmentId = session.metadata?.appointmentId;
-//       const paymentId = session.metadata?.paymentId;
+        if (session.payment_status !== "paid") {
+          throw new AppError(status.BAD_REQUEST, "Payment not completed");
+        }
 
-//       if (!appointmentId || !paymentId) {
-//         console.error("⚠️ Missing metadata in webhook event");
-//         return { message: "Missing metadata" };
-//       }
+        await prisma.payment.update({
+          where: {
+            id: paymentId,
+          },
+          data: {
+            paymentData: session,
+            transactionId: session.payment_intent?.transaction_id,
+            status:
+              session.payment_status === "paid"
+                ? PaymentStatus.PAID
+                : PaymentStatus.FAILED,
+          },
+        });
 
-//       // Verify appointment exists with related data
-//       const appointment = await prisma.appointment.findUnique({
-//         where: { id: appointmentId },
-//         include: {
-//           patient: true,
-//           doctor: true,
-//           schedule: true,
-//           payment: true,
-//         },
-//       });
+        console.log(`🔓 Payment success: ${paymentId}`);
 
-//       if (!appointment) {
-//         console.error(
-//           `⚠️ Appointment ${appointmentId} not found. Payment may be for expired appointment.`,
-//         );
-//         return { message: "Appointment not found" };
-//       }
-//       let pdfBuffer: Buffer | null = null;
+        break;
+      }
 
-//       // Update both appointment and payment in a transaction
-//       const result = await prisma.$transaction(async (tx) => {
-//         const updatedAppointment = await tx.appointment.update({
-//           where: {
-//             id: appointmentId,
-//           },
-//           data: {
-//             paymentStatus:
-//               session.payment_status === "paid"
-//                 ? PaymentStatus.PAID
-//                 : PaymentStatus.UNPAID,
-//           },
-//         });
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
 
-//         let invoiceUrl = null;
+        const paymentId = session.metadata?.paymentId;
 
-//         // If payment is successful, generate and upload invoice
-//         if (session.payment_status === "paid") {
-//           try {
-//             // Generate invoice PDF
-//             pdfBuffer = await generateInvoicePdf({
-//               invoiceId: appointment.payment?.id || paymentId,
-//               patientName: appointment.patient.name,
-//               patientEmail: appointment.patient.email,
-//               doctorName: appointment.doctor.name,
-//               appointmentDate: appointment.schedule.startDateTime.toString(),
-//               amount: appointment.payment?.amount || 0,
-//               transactionId: appointment.payment?.transactionId || "",
-//               paymentDate: new Date().toISOString(),
-//             });
+        if (paymentId) {
+          await prisma.payment.update({
+            where: { id: paymentId },
+            data: {
+              status: PaymentStatus.FAILED,
+              paymentData: {
+                stripeSessionId: session.id,
+                expired: true,
+              },
+            },
+          });
+        }
 
-//             // Upload PDF to Cloudinary
-//             const cloudinaryResponse = await uploadFileToCloudinary(
-//               pdfBuffer,
-//               `ph-healthcare/invoices/invoice-${paymentId}-${Date.now()}.pdf`,
-//             );
+        break;
+      }
 
-//             invoiceUrl = cloudinaryResponse?.secure_url;
+      default: {
+        console.log(`Unhandled event: ${event.type}`);
+        return { message: "Ignored event" };
+      }
+    }
+  } catch (error) {
+    console.error("❌ Webhook Error:", error);
+    return { message: "Webhook failed" };
+  }
+};
 
-//             console.log(
-//               `✅ Invoice PDF generated and uploaded for payment ${paymentId}`,
-//             );
-//           } catch (pdfError) {
-//             console.error(
-//               "❌ Error generating/uploading invoice PDF:",
-//               pdfError,
-//             );
-//             // Continue with payment update even if PDF generation fails
-//           }
-//         }
-
-//         const updatedPayment = await tx.payment.update({
-//           where: {
-//             id: paymentId,
-//           },
-//           data: {
-//             status:
-//               session.payment_status === "paid"
-//                 ? PaymentStatus.PAID
-//                 : PaymentStatus.UNPAID,
-//             paymentGatewayData: session,
-//             invoiceUrl: invoiceUrl, // Store invoice URL
-//             stripeEventId: event.id, // Store event ID for idempotency
-//           },
-//         });
-
-//         return { updatedAppointment, updatedPayment, invoiceUrl };
-//       });
-
-//       // Send invoice email to patient (outside transaction to avoid blocking payment update)
-//       if (session.payment_status === "paid" && result.invoiceUrl) {
-//         try {
-//           await sendEmail({
-//             to: appointment.patient.email,
-//             subject: `Payment Confirmation & Invoice - Appointment with ${appointment.doctor.name}`,
-//             templateName: "invoice",
-//             templateData: {
-//               patientName: appointment.patient.name,
-//               invoiceId: appointment.payment?.id || paymentId,
-//               transactionId: appointment.payment?.transactionId || "",
-//               paymentDate: new Date().toLocaleDateString(),
-//               doctorName: appointment.doctor.name,
-//               appointmentDate: new Date(
-//                 appointment.schedule.startDateTime,
-//               ).toLocaleDateString(),
-//               amount: appointment.payment?.amount || 0,
-//               invoiceUrl: result.invoiceUrl,
-//             },
-//             attachments: [
-//               {
-//                 filename: `Invoice-${paymentId}.pdf`,
-//                 content: pdfBuffer || Buffer.from(""), // Attach PDF if generated, else empty buffer
-//                 contentType: "application/pdf",
-//               },
-//             ],
-//           });
-
-//           console.log(`✅ Invoice email sent to ${appointment.patient.email}`);
-//         } catch (emailError) {
-//           console.error("❌ Error sending invoice email:", emailError);
-//           // Log but don't fail the payment if email fails
-//         }
-//       }
-
-//       console.log(
-//         `✅ Payment ${session.payment_status} for appointment ${appointmentId}`,
-//       );
-//       break;
-//     }
-
-//     case "checkout.session.expired": {
-//       const session = event.data.object;
-
-//       console.log(
-//         `Checkout session ${session.id} expired. Marking associated payment as failed.`,
-//       );
-//       break;
-//     }
-//     case "payment_intent.payment_failed": {
-//       const session = event.data.object;
-
-//       console.log(
-//         `Payment intent ${session.id} failed. Marking associated payment as failed.`,
-//       );
-//       break;
-//     }
-//     default:
-//       console.log(`Unhandled event type ${event.type}`);
-//   }
-
-//   return { message: `Webhook Event ${event.id} processed successfully` };
-// };
-
-export const paymentServices = {};
+export const paymentServices = {
+  handlerStripeWebhookEvent,
+};

@@ -154,7 +154,8 @@ const pendingIdeas = catchAsync(async (req: Request, res: Response) => {
 
 const singleIdea = catchAsync(async (req: Request, res: Response) => {
   const { ideaId } = req.params;
-  const data = await ideaServices.singleIdea(ideaId as string);
+  const user = (req.user as IRequestUser) || null;
+  const data = await ideaServices.singleIdea(user, ideaId as string);
   sendResponse(res, {
     success: true,
     statusCode: status.OK,
@@ -202,13 +203,49 @@ const votedIdea = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const initiatePayment = catchAsync(async (req: Request, res: Response) => {
+  const { ideaId } = req.params;
+  const user = req.user as IRequestUser;
+  const result = await ideaServices.initiatePayment(
+    ideaId as string,
+    user.userId as string,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: status.ACCEPTED,
+    message: "Payment session created successfully",
+    data: result,
+  });
+});
+
+const getSomeIdeaDataForBuying = catchAsync(async (req: Request, res: Response) => {
+  const { ideaId } = req.params;
+  const user = req.user as IRequestUser;
+  const result = await ideaServices.getSomeIdeaDataForBuying(
+    ideaId as string,
+    user.userId as string,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Idea data fetched successfully",
+    data: result,
+  });
+});
+
+
+
+
 export const ideaControllers = {
   updateIdea,
   getApprovedAndRejectedIdeas,
   getDraftIdeas,
+  getSomeIdeaDataForBuying,
   changeIdeaStatus,
   votedIdea,
   singleIdea,
+  initiatePayment,
   upVote,
   downVote,
   createIdea,

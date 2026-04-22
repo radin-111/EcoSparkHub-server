@@ -18,4 +18,5 @@ enum ProfileStatus {
 enum PaymentStatus {
     PAID
     UNPAID
+    FAILED
 }

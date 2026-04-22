@@ -5,9 +5,11 @@ import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
 import { IRequestUser } from "../../interfaces/user.interface";
 import { IRequestIdeaCreate } from "./idea.interface";
-import { IdeaStatus } from "../../../generated/prisma/enums";
+import { IdeaStatus, PaymentStatus } from "../../../generated/prisma/enums";
 import { deleteFileFromCloudinary } from "../../config/cloudinary.config";
-
+import { stripe } from "../../config/stripe.config";
+import { envConfig } from "../../config/env";
+import { v4 as uuidv4 } from "uuid";
 const createIdea = async (user: IRequestUser, payload: IRequestIdeaCreate) => {
   const isCategoryExist = await prisma.category.findUnique({
     where: {
@@ -228,7 +230,7 @@ const pendingIdeas = async (page: number, limit: number) => {
   return { totalPages, data };
 };
 
-const singleIdea = async (ideaId: string) => {
+const singleIdea = async (user: IRequestUser | null, ideaId: string) => {
   const data = await prisma.idea.findUnique({
     where: {
       id: ideaId,
@@ -237,6 +239,28 @@ const singleIdea = async (ideaId: string) => {
   if (!data) {
     throw new AppError(status.NOT_FOUND, "Idea not found");
   }
+
+  if (data.isPaid) {
+    if (user) {
+      const paymentData = await prisma.payment.findFirst({
+        where: {
+          ideaId: ideaId,
+          userId: user.userId,
+          status: PaymentStatus.PAID,
+        },
+      });
+
+      if (paymentData) {
+        return data;
+      }else{
+        return { redirect: true };
+      }
+      
+    }else{
+      return { redirect: true };
+    }
+  }
+
   return data;
 };
 const upVote = async (user: IRequestUser, ideaId: string) => {
@@ -327,7 +351,7 @@ const votedIdea = async (user: IRequestUser, ideaId: string) => {
   const isVoted = await prisma.vote.findFirst({
     where: {
       userId: user.userId,
-      
+
       ideaId,
     },
   });
@@ -336,9 +360,106 @@ const votedIdea = async (user: IRequestUser, ideaId: string) => {
   }
   return null;
 };
+
+const initiatePayment = async (ideaId: string, userId: string) => {
+  const isIdeaExist = await prisma.idea.findUnique({
+    where: {
+      id: ideaId,
+      isPaid: true,
+      status: IdeaStatus.APPROVED,
+    },
+  });
+  if (!isIdeaExist) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  const payment = await prisma.payment.create({
+    data: {
+      amount: isIdeaExist.price * 100,
+      currency: "usd",
+      userId,
+      ideaId,
+      transactionId: uuidv4(),
+      status: PaymentStatus.UNPAID,
+    },
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: isIdeaExist.name,
+          },
+          unit_amount: isIdeaExist.price * 100,
+        },
+        
+        quantity: 1,
+      },
+    ],
+    
+    metadata: {
+      ideaId: ideaId,
+      paymentId: payment.id,
+      userId: userId,
+    },
+
+    cancel_url: `${envConfig.APP_URL}/dashboard/ideas/${ideaId}`,
+    success_url: `${envConfig.APP_URL}/dashboard/payment`,
+  });
+
+  if (!session) {
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      "Payment session creation failed",
+    );
+  }
+
+  return session;
+};
+
+const getSomeIdeaDataForBuying = async (ideaId: string, userId: string) => {
+  const isPurchased = await prisma.payment.findFirst({
+    where: {
+      ideaId: ideaId,
+      userId: userId,
+      status: PaymentStatus.PAID,
+    },
+  });
+  if (isPurchased) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "You have already purchased this idea",
+    );
+  }
+
+  const data = await prisma.idea.findUniqueOrThrow({
+    where: {
+      id: ideaId,
+      isPaid: true,
+      status: IdeaStatus.APPROVED,
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      isPaid: true,
+      imageUrl: true,
+    },
+  });
+  if (!data) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  return data;
+};
+
 export const ideaServices = {
   changeIdeaStatus,
   deleteIdea,
+  initiatePayment,
+  getSomeIdeaDataForBuying,
   createIdea,
   getApprovedAndRejectedIdeas,
   singleIdea,

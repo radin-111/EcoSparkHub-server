@@ -21,6 +21,7 @@ interface allEnv {
   REFRESH_TOKEN_EXPIRES_IN: string;
   ACCESS_TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
+  STRIPE_WEBHOOK_SECRET: string;
 
   EMAIL_SENDER:{
     EMAIL_SENDER_EMAIL: string;
@@ -85,6 +86,7 @@ const loadEnv = (): allEnv => {
     ADMIN_NAME: process.env.ADMIN_NAME as string,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL as string,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD as string,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
     ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
     REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
     CLOUDINARY:{

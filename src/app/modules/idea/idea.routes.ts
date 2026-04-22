@@ -9,6 +9,7 @@ import {
   ideaUpdateSchema,
 } from "./idea.validation";
 import { multerUpload } from "../../config/multer.config";
+import { addUser } from "../../middlewares/addUser";
 
 const router = Router();
 
@@ -32,7 +33,12 @@ router.post(
   auth(UserRoles.MEMBER),
   ideaControllers.downVote,
 );
-router.get("/:ideaId", ideaControllers.singleIdea);
+router.get("/:ideaId", addUser(),  ideaControllers.singleIdea);
+router.get("/some-data/:ideaId", auth(UserRoles.MEMBER, UserRoles.ADMIN), ideaControllers.getSomeIdeaDataForBuying);
+router.post("/initiate-payment/:ideaId", auth(UserRoles.MEMBER, UserRoles.ADMIN), ideaControllers.initiatePayment);
+
+
+
 router.post(
   "/create-idea",
   auth(UserRoles.MEMBER),
