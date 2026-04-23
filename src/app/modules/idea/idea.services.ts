@@ -242,6 +242,9 @@ const singleIdea = async (user: IRequestUser | null, ideaId: string) => {
 
   if (data.isPaid) {
     if (user) {
+      if(user.userId===data.userId){
+        return data;
+      }
       const paymentData = await prisma.payment.findFirst({
         where: {
           ideaId: ideaId,

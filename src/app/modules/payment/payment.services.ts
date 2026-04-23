@@ -97,6 +97,20 @@ const getMyTransactions = async (
     },
     skip: (page - 1) * limit,
     take: limit,
+     select: {
+      id: true,
+      user:{
+        select:{
+          email: true,
+        }
+      },
+      currency: true,
+      amount: true,
+      transactionId: true,
+      status: true,
+      createdAt: true,
+      
+    },
   });
   return { transactions, totalPages };
 };
@@ -108,6 +122,20 @@ const getAllTransactions = async (page: number, limit: number) => {
   const transactions = await prisma.payment.findMany({
     skip: (page - 1) * limit,
     take: limit,
+    select: {
+      id: true,
+      user:{
+        select:{
+          email: true,
+        }
+      },
+      currency: true,
+      amount: true,
+      transactionId: true,
+      status: true,
+      createdAt: true,
+      
+    },
   });
   return { transactions, totalPages };
 };
